@@ -31,7 +31,7 @@ img { max-width: 100%; display: block; }
 
 /* 頂部選單 */
 .topbar {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
   display: flex; align-items: center; gap: 24px;
   padding: 12px 24px;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -242,11 +242,15 @@ img { max-width: 100%; display: block; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #181612; --surface: #221f1a; --ink: #f2ece2; --muted: #a89e90;
-    --line: #3a352d; --accent: #fb923c; --accent-soft: #3b2416;
+    --line: #3a352d; --accent: #fb923c; --accent-soft: #3b2416; color-scheme: dark;
   }
-  :root:not([data-theme="light"]) .flip-back { background: #f2ece2; color: #181612; }
   :root:not([data-theme="light"]) .flip-back .label { color: #c2410c; }
 }
+:root[data-theme="dark"] {
+  --bg: #181612; --surface: #221f1a; --ink: #f2ece2; --muted: #a89e90;
+  --line: #3a352d; --accent: #fb923c; --accent-soft: #3b2416; color-scheme: dark;
+}
+:root[data-theme="dark"] .flip-back .label { color: #c2410c; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
