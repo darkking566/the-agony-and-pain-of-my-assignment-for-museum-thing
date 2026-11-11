@@ -104,12 +104,15 @@
         <ul class="events">${e.events.map((ev) => `<li><b>${esc(ev.year)}</b>${esc(ev.text)}</li>`).join('')}</ul>
       </div>
       <div class="phone-row">${phones.map(phoneCard).join('')}</div>
+      ${phones.some((p) => M.scenes[p.id]) ? `<div class="era-scenes">${phones.filter((p) => M.scenes[p.id]).map((p) =>
+        `<button class="btn small" data-scene="${p.id}">▶ 沉浸體驗：${esc(M.scenes[p.id].title)}</button>`).join('')}</div>` : ''}
       <div class="era-nav">
         <button class="btn small" id="era-prev" ${i === 0 ? 'disabled hidden' : ''}>← ${i > 0 ? esc(M.eras[i - 1].label) : ''}</button>
         <button class="btn small" id="era-next" ${i === M.eras.length - 1 ? 'disabled hidden' : ''}>${i < M.eras.length - 1 ? esc(M.eras[i + 1].label) : ''} →</button>
       </div>`;
     panel.style.animation = 'none'; void panel.offsetWidth; panel.style.animation = '';
     panel.querySelectorAll('.flip').forEach((f) => f.addEventListener('click', () => f.classList.toggle('flipped')));
+    panel.querySelectorAll('[data-scene]').forEach((b) => b.addEventListener('click', () => enterScene(phoneById(b.dataset.scene), b)));
     $('#era-prev').onclick = () => selectEra(i - 1);
     $('#era-next').onclick = () => selectEra(i + 1);
     if (highlightId) {
@@ -162,8 +165,10 @@
       <h3>${esc(p.name)}</h3>
       <p>${esc(p.feature)}</p>
       <p>${esc(p.look)}</p>
-      <button class="btn small" id="hall-to-2d">在時間軸中查看 →</button>`;
+      <button class="btn small" id="hall-to-2d">在時間軸中查看 →</button>
+      ${M.scenes[p.id] ? '<button class="btn small hall-enter" id="hall-enter">▶ 進入沉浸體驗</button>' : ''}`;
     $('#hall-to-2d').onclick = () => showPhone2D(p.id);
+    if (M.scenes[p.id]) $('#hall-enter').onclick = () => enterScene(p, $('#hall-enter'));
   }
 
   function loadHall() {
@@ -172,7 +177,11 @@
     hallLoading = import('./hall3d.js')
       .then((mod) => document.fonts.ready.then(() => mod))
       .then((mod) => {
-        hall = mod.initHall($('#hall-canvas'), M.phones, { onSelect: renderHallInfo });
+        hall = mod.initHall($('#hall-canvas'), M.phones, {
+          onSelect: renderHallInfo,
+          hasScene: (p) => !!M.scenes[p.id],
+          onEnter: (p) => enterScene(p, $('#hall-enter'))
+        });
         $('#hall-loading').remove();
         $('#hall-prev').onclick = () => hall.step(-1);
         $('#hall-next').onclick = () => hall.step(1);
@@ -185,6 +194,38 @@
         hallLoading = null;
       });
     return hallLoading;
+  }
+
+  /* ---------- 沉浸體驗 ---------- */
+  let inScene = false;
+  function enterScene(p, returnFocus) {
+    if (inScene) return;
+    inScene = true;
+    if (hall) hall.pause();
+    import('./immersive.js')
+      .then((mod) => document.fonts.ready.then(() => mod))
+      .then((mod) => window.__imm = mod.openExperience({
+        script: M.scenes[p.id], phone: p,
+        onExit: () => {
+          inScene = false;
+          if (hall && !panel3d.hidden) hall.resume();
+          if (returnFocus && document.body.contains(returnFocus)) returnFocus.focus();
+        }
+      }))
+      .catch((err) => {
+        console.error(err);
+        inScene = false;
+        if (hall && !panel3d.hidden) hall.resume();
+        alertBox('沉浸體驗載入失敗。請用網頁伺服器開啟（見 README）。');
+      });
+  }
+  function alertBox(msg) {
+    const d = document.createElement('div');
+    d.className = 'imm-toast show';
+    d.style.cssText = 'position:fixed;z-index:1001;background:#1f1b16;color:#fff';
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 4000);
   }
 
   function showPhone3D(id) {

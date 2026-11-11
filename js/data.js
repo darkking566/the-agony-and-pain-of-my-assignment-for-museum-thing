@@ -223,6 +223,71 @@ window.MUSEUM = {
     ]
   },
 
+  // 沉浸體驗：key 是手機的 id。劇情分成「演出」(play) 和「自由參觀」(explore) 兩種段落。
+  // play：captions 是字幕（at = 第幾秒出現），focus 是鏡頭要提示觀眾看的地方。
+  // explore：使用者自由轉動視角，看向發光的地方就會出現 hotspots 裡的解說。
+  // 動作本身寫在 js/scenes/<module>.js，這裡只放文字，改字幕或解說不用動程式。
+  scenes: {
+    'dynatac-8000x': {
+      module: 'dynatac',
+      title: '1984・街頭的「大哥大」',
+      intro: '你正站在 1984 年美國某座城市的人行道上。第一支商用手機 Motorola DynaTAC 8000X 剛上市不久，看看街上的人怎麼看待它。',
+      note: '情境重現：依據史料推想當時的典型情況，人物與情節為虛構。',
+      beats: [
+        { type: 'play', scene: 'street',
+          captions: [
+            { at: 0, text: '1984 年，美國某座城市的街頭。' },
+            { at: 4.5, text: '那時候人在外面想打電話，多半要找公共電話、投硬幣。' }
+          ],
+          focus: [{ at: 0, target: 'street' }, { at: 4, target: 'payphone' }] },
+        { type: 'play', scene: 'arrive',
+          captions: [
+            { at: 0, text: '一位穿西裝的上班族走了過來，手上拿著一個像磚頭的東西。' },
+            { at: 7.6, text: '他把它舉到耳邊——開始講電話。' }
+          ],
+          focus: [{ at: 0, target: 'exec' }] },
+        { type: 'play', scene: 'stare',
+          captions: [
+            { at: 0, text: '路人紛紛停下腳步。' },
+            { at: 4, text: '沒有電線、站在路邊就能講電話，對當時的人來說簡直像科幻電影。' }
+          ],
+          focus: [{ at: 0, target: 'crowd' }, { at: 4, target: 'exec' }] },
+        { type: 'explore', hotspots: ['phone', 'payphone', 'car', 'crowd'],
+          prompt: '自由參觀：轉動視角，看向發光的圓點' },
+        { type: 'play', scene: 'dead',
+          captions: [
+            { at: 0, text: '講沒多久，電話突然沒聲音了。' },
+            { at: 4.5, text: '電池用完了。這支手機充飽電，大約只能講 30 分鐘。' }
+          ],
+          focus: [{ at: 0, target: 'exec' }] },
+        { type: 'play', scene: 'payphone',
+          captions: [
+            { at: 0, text: '他只好走向公共電話。' },
+            { at: 6, text: '在那個年代，「把電話帶在身上」還是少數人才有的奢侈。' }
+          ],
+          focus: [{ at: 0, target: 'exec' }] },
+        { type: 'explore', hotspots: ['mast', 'exec', 'news'],
+          prompt: '自由參觀：抬頭、轉身看看，還有幾個地方可以看' }
+      ],
+      hotspots: {
+        phone: { title: 'Motorola DynaTAC 8000X',
+          text: '第一支商用手持行動電話，1983 年獲准上市。售價約 3,995 美元，重約 790 公克，可以存 30 組號碼。充飽電大約能講 30 分鐘，充電卻要 10 個小時左右。' },
+        payphone: { title: '公共電話',
+          text: '手機普及以前，在外面打電話要靠公共電話：找到電話亭、投硬幣，講完再把話筒掛回去。很多人身上帶零錢，就是為了打電話。' },
+        car: { title: '車用電話的天線',
+          text: '手持手機出現以前，「行動電話」大多裝在汽車裡，靠汽車的電瓶供電。後車窗上那根捲捲的天線，就是這台車裝了電話的標誌。' },
+        crowd: { title: '路人的反應',
+          text: '當時手機昂貴又少見，在街上拿著它講電話，很容易成為大家注目的焦點。對很多人來說，這是第一次看到「沒有電線的電話」。' },
+        mast: { title: '基地台',
+          text: '手機要靠附近的基地台收發訊號。1983 年 10 月，美國第一個商用蜂巢式行動網路在芝加哥開通。這一代（1G）用類比訊號，只能講電話，而且容易被人用無線電掃描器偷聽。' },
+        exec: { title: '身分的象徵',
+          text: '因為價格高昂，DynaTAC 很快成了成功商人的象徵。1987 年的電影《華爾街》裡，主角在海灘上拿著它講電話，成為那個年代的經典畫面。' },
+        news: { title: '第一通手機電話',
+          text: '1973 年 4 月 3 日，Motorola 工程師馬丁·庫珀在紐約街頭用 DynaTAC 原型機，打給競爭對手貝爾實驗室，這被視為史上第一通手持行動電話。從原型機到正式上市，花了整整 10 年。' }
+      }
+    }
+  },
+
   sources: [
     { name: 'Mobile Phone Museum', url: 'https://www.mobilephonemuseum.com/' },
     { name: 'mowned', url: 'https://mowned.com/' },

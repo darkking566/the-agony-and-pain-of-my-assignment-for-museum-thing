@@ -7,7 +7,7 @@ const SPACING = 3.2;   // 展台間距
 const PED_H = 1.0;     // 展台高度
 const BG = '#15130f';
 
-export function initHall(container, phones, { onSelect } = {}) {
+export function initHall(container, phones, { onSelect, onEnter, hasScene = () => false } = {}) {
   /* ---------- 基本場景 ---------- */
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -50,6 +50,7 @@ export function initHall(container, phones, { onSelect } = {}) {
   scene.add(wall);
 
   /* ---------- 展品 ---------- */
+  const rings = [];
   const pedMat = new THREE.MeshStandardMaterial({ color: '#ebe4d6', roughness: 0.7 });
   const exhibits = phones.map((p, i) => {
     const x = i * SPACING;
@@ -92,6 +93,15 @@ export function initHall(container, phones, { onSelect } = {}) {
     hit.position.set(x, (PED_H + size.y + 0.2) / 2, 0);
     hit.userData.index = i;
     scene.add(hit);
+
+    // 有沉浸體驗的展台，台面上加一圈發光環
+    if (hasScene(p)) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.025, 8, 48), new THREE.MeshBasicMaterial({ color: '#fb923c' }));
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(x, PED_H + 0.02, 0);
+      scene.add(ring);
+      rings.push(ring);
+    }
 
     return { p, pivot, hit, size };
   });
@@ -173,7 +183,10 @@ export function initHall(container, phones, { onSelect } = {}) {
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     const hit = ray.intersectObjects(exhibits.map((x) => x.hit))[0];
-    if (hit && hit.object.userData.index !== current) goTo(hit.object.userData.index);
+    if (!hit) return;
+    const i = hit.object.userData.index;
+    if (i !== current) goTo(i);
+    else if (hasScene(phones[i]) && onEnter) onEnter(phones[i]); // 點目前這支手機 → 進入沉浸體驗
   }
 
   function onKey(e) {
@@ -216,6 +229,8 @@ export function initHall(container, phones, { onSelect } = {}) {
       cur.rotation.y += spin;
       if (!reduceMotion && performance.now() - idleAt > 2500) cur.rotation.y += dt * 0.4;
     }
+    const glow = 0.6 + Math.sin(t / 300) * 0.4;
+    rings.forEach((r) => r.material.color.setRGB(0.98, 0.57 * (0.8 + glow * 0.2), 0.24 * glow));
     renderer.render(scene, camera);
   }
   function resume() {
@@ -271,7 +286,7 @@ function antenna(group, x, y, z, len, r = 0.018) {
   group.add(a);
 }
 
-function buildPhone(p) {
+export function buildPhone(p) {
   const g = new THREE.Group();
   const body = mat(p.color);
   const dark = mat('#141414', { roughness: 0.3 });
@@ -487,6 +502,7 @@ function screenTexture(kind) {
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 4;
+  t.userData.shared = true; // 展廳和沉浸場景共用，離開場景時不要釋放
   texCache[kind] = t;
   return t;
 }
