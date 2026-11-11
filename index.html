@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>機不可失：行動電話發展史</title>
+  <meta name="description" content="線上互動博物館：從 1940 年代的對講機到 2020 年代的 AI 手機。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top">機不可失</a>
+    <nav class="topnav" aria-label="主選單">
+      <a href="#quiz">心理測驗</a>
+      <a href="#exhibit">展覽</a>
+      <a href="#people">人物</a>
+      <a href="#issues">議題</a>
+      <a href="#sources">資料來源</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">線上互動博物館</p>
+      <h1>機不可失<span>行動電話發展史</span></h1>
+      <p class="lead">從 1940 年代的無線對講機，到 2020 年代會用 AI 的智慧型手機。<br>一起看看你每天拿在手上的東西，是怎麼一步步變成現在的樣子。</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#quiz">先做心理測驗</a>
+        <a class="btn" href="#exhibit">直接入場</a>
+      </div>
+    </section>
+
+    <!-- 心理測驗 -->
+    <section id="quiz" class="section">
+      <div class="section-head">
+        <p class="eyebrow">入場前</p>
+        <h2>你是哪一種手機？</h2>
+      </div>
+      <div class="quiz-card" id="quiz-card" aria-live="polite"></div>
+    </section>
+
+    <!-- 展覽：2D / 3D 切換 -->
+    <section id="exhibit" class="section">
+      <div class="section-head">
+        <p class="eyebrow">主展區</p>
+        <h2>行動電話時間軸</h2>
+        <div class="mode-switch" role="tablist" aria-label="參觀模式">
+          <button role="tab" id="tab-2d" aria-selected="true" aria-controls="panel-2d">平面時間軸</button>
+          <button role="tab" id="tab-3d" aria-selected="false" aria-controls="panel-3d">3D 展廳</button>
+        </div>
+      </div>
+
+      <div id="panel-2d" role="tabpanel" aria-labelledby="tab-2d">
+        <div class="era-rail" id="era-rail" role="tablist" aria-label="年代"></div>
+        <div class="era-panel" id="era-panel"></div>
+      </div>
+
+      <div id="panel-3d" role="tabpanel" aria-labelledby="tab-3d" hidden>
+        <div class="hall" id="hall">
+          <div class="hall-canvas" id="hall-canvas"></div>
+          <div class="hall-loading" id="hall-loading">展廳載入中…</div>
+          <div class="hall-hint">拖曳旋轉手機 · 點其他展台或用 ← → 移動</div>
+          <button class="hall-nav prev" id="hall-prev" aria-label="上一件展品">‹</button>
+          <button class="hall-nav next" id="hall-next" aria-label="下一件展品">›</button>
+          <div class="hall-info" id="hall-info"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 人物 -->
+    <section id="people" class="section">
+      <div class="section-head">
+        <p class="eyebrow">幕後推手</p>
+        <h2>重要人物</h2>
+      </div>
+      <div class="people-grid" id="people-grid"></div>
+    </section>
+
+    <!-- 議題 -->
+    <section id="issues" class="section">
+      <div class="section-head">
+        <p class="eyebrow">延伸思考</p>
+        <h2>手機與我們的生活</h2>
+      </div>
+      <div class="issue-grid" id="issue-grid"></div>
+    </section>
+
+    <section id="sources" class="section">
+      <div class="section-head">
+        <p class="eyebrow">取材</p>
+        <h2>資料來源</h2>
+      </div>
+      <ul class="source-list" id="source-list"></ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>博物館就像是每件展品的漫長「自我介紹」。</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,1 +1,41 @@
-# the-agony-and-pain-of-my-assignment-for-museum-thing
+# 機不可失：行動電話發展史
+
+期末報告的線上互動博物館。沒有建置步驟，純 HTML / CSS / JavaScript。
+
+## 內容
+
+- **心理測驗**：入場前先做 4 題測驗，結果會對應一支代表手機，可以直接跳到時間軸或 3D 展廳看它。
+- **平面時間軸（主要動線）**：點年代或左右滑動切換，每支手機是一張卡片，點一下會翻面顯示介紹。
+- **3D 展廳**：每支手機放在展台上，排成一條時間走廊。可以拖曳旋轉手機，用左右鍵、箭頭按鈕或點其他展台移動。
+- **重要人物、延伸議題、資料來源**
+
+## 檔案
+
+| 檔案 | 用途 |
+| --- | --- |
+| `index.html` | 頁面架構 |
+| `css/style.css` | 樣式 |
+| `js/data.js` | **所有展覽內容**（年代、手機、人物、議題、測驗）。改文字只要改這裡，2D 和 3D 會一起更新 |
+| `js/app.js` | 測驗、時間軸、模式切換 |
+| `js/hall3d.js` | 3D 展廳（Three.js）。手機模型是用程式畫的簡化模型，不需要另外下載 3D 檔 |
+| `images/` | 手機照片放這裡 |
+
+## 放照片
+
+把照片放進 `images/`，檔名要跟 `js/data.js` 裡每支手機的 `img` 一樣，例如 `images/nokia-3310.jpg`。
+還沒放照片的卡片會顯示提示，告訴你該用哪個檔名。記得在資料來源註明照片出處。
+
+## 本機預覽
+
+3D 展廳用到 JavaScript 模組，直接雙擊 `index.html` 開會載入失敗，要用網頁伺服器開：
+
+```bash
+python3 -m http.server 8000
+# 然後打開 http://localhost:8000
+```
+
+VS Code 也可以用 Live Server 擴充功能。
+
+## 發布到網路（GitHub Pages）
+
+到 GitHub repo 的 **Settings → Pages**，Source 選 `Deploy from a branch`，選分支和 `/ (root)`，存檔後等一兩分鐘就會有網址。
