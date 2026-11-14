@@ -222,7 +222,7 @@
   function alertBox(msg) {
     const d = document.createElement('div');
     d.className = 'imm-toast show';
-    d.style.cssText = 'position:fixed;z-index:1001;background:#1f1b16;color:#fff';
+    d.style.cssText = 'position:fixed;z-index:1001;background:#0a1324;color:#fff';
     d.textContent = msg;
     document.body.appendChild(d);
     setTimeout(() => d.remove(), 4000);

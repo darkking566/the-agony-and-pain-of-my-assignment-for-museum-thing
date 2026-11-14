@@ -484,13 +484,13 @@ function glowTexture(done) {
   c.width = c.height = 128;
   const x = c.getContext('2d');
   const g = x.createRadialGradient(64, 64, 8, 64, 64, 64);
-  g.addColorStop(0, done ? 'rgba(255,255,255,.9)' : 'rgba(255,214,150,1)');
-  g.addColorStop(0.35, done ? 'rgba(200,200,200,.35)' : 'rgba(255,140,40,.65)');
-  g.addColorStop(1, 'rgba(255,120,20,0)');
+  g.addColorStop(0, done ? 'rgba(255,255,255,.9)' : 'rgba(200,225,255,1)');
+  g.addColorStop(0.35, done ? 'rgba(200,200,200,.35)' : 'rgba(70,150,255,.65)');
+  g.addColorStop(1, 'rgba(40,120,255,0)');
   x.fillStyle = g;
   x.fillRect(0, 0, 128, 128);
   x.lineWidth = 6;
-  x.strokeStyle = done ? 'rgba(255,255,255,.8)' : '#fff3e0';
+  x.strokeStyle = done ? 'rgba(255,255,255,.8)' : '#e8f1ff';
   x.beginPath(); x.arc(64, 64, 30, 0, Math.PI * 2); x.stroke();
   if (done) {
     x.strokeStyle = '#3b7d3b';

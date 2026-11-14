@@ -5,7 +5,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 
 const SPACING = 3.2;   // 展台間距
 const PED_H = 1.0;     // 展台高度
-const BG = '#15130f';
+const BG = '#060a14';
 
 export function initHall(container, phones, { onSelect, onEnter, hasScene = () => false } = {}) {
   /* ---------- 基本場景 ---------- */
@@ -22,11 +22,11 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 60);
 
-  scene.add(new THREE.HemisphereLight('#fff1dc', '#2b241b', 1.4));
+  scene.add(new THREE.HemisphereLight('#eef4ff', '#121a2c', 1.4));
   const fill = new THREE.DirectionalLight('#ffffff', 0.6);
   fill.position.set(3, 6, 5);
   scene.add(fill);
-  const spot = new THREE.SpotLight('#ffe2bd', 28, 12, Math.PI / 7, 0.6, 1.4);
+  const spot = new THREE.SpotLight('#e4eeff', 28, 12, Math.PI / 7, 0.6, 1.4);
   spot.castShadow = true;
   spot.shadow.mapSize.set(1024, 1024);
   scene.add(spot, spot.target);
@@ -34,7 +34,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
   const span = (phones.length - 1) * SPACING;
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(span + 30, 20),
-    new THREE.MeshStandardMaterial({ color: '#2a251f', roughness: 0.95 })
+    new THREE.MeshStandardMaterial({ color: '#121a2b', roughness: 0.95 })
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.x = span / 2;
@@ -43,7 +43,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
   const wall = new THREE.Mesh(
     new THREE.PlaneGeometry(span + 30, 8),
-    new THREE.MeshStandardMaterial({ color: '#3a332a', roughness: 1 })
+    new THREE.MeshStandardMaterial({ color: '#1a2438', roughness: 1 })
   );
   wall.position.set(span / 2, 4, -2.4);
   wall.receiveShadow = true;
@@ -51,7 +51,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
   /* ---------- 展品 ---------- */
   const rings = [];
-  const pedMat = new THREE.MeshStandardMaterial({ color: '#ebe4d6', roughness: 0.7 });
+  const pedMat = new THREE.MeshStandardMaterial({ color: '#eef2f8', roughness: 0.7 });
   const exhibits = phones.map((p, i) => {
     const x = i * SPACING;
     const ped = new THREE.Mesh(new RoundedBoxGeometry(1.2, PED_H, 1.2, 3, 0.04), pedMat);
@@ -64,8 +64,8 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
       new THREE.PlaneGeometry(1.0, 0.5),
       new THREE.MeshBasicMaterial({
         map: textTexture([
-          { text: String(p.year), size: 92, weight: 900, color: '#c2410c' },
-          { text: p.name, size: fitSize(p.name, 44, 460), weight: 700, color: '#1f1b16' }
+          { text: String(p.year), size: 92, weight: 900, color: '#1d4ed8' },
+          { text: p.name, size: fitSize(p.name, 44, 460), weight: 700, color: '#0a1324' }
         ], { w: 512, h: 256 })
       })
     );
@@ -96,7 +96,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
     // 有沉浸體驗的展台，台面上加一圈發光環
     if (hasScene(p)) {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.025, 8, 48), new THREE.MeshBasicMaterial({ color: '#fb923c' }));
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.025, 8, 48), new THREE.MeshBasicMaterial({ color: '#60a5fa' }));
       ring.rotation.x = -Math.PI / 2;
       ring.position.set(x, PED_H + 0.02, 0);
       scene.add(ring);
@@ -114,13 +114,13 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
     const sign = new THREE.Mesh(
       new THREE.PlaneGeometry(2.4, 0.6),
       new THREE.MeshBasicMaterial({
-        map: textTexture([{ text: p.era.replace('s', ' 年代'), size: 120, weight: 900, color: '#f4efe6' }], { w: 1024, h: 256 }),
+        map: textTexture([{ text: p.era.replace('s', ' 年代'), size: 120, weight: 900, color: '#eef3fb' }], { w: 1024, h: 256 }),
         transparent: true
       })
     );
     sign.position.set(i * SPACING - 0.4, 2.2, -2.38);
     scene.add(sign);
-    const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.7), new THREE.MeshBasicMaterial({ color: '#c2410c' }));
+    const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.7), new THREE.MeshBasicMaterial({ color: '#1d4ed8' }));
     bar.position.set(i * SPACING - 1.65, 2.2, -2.37);
     scene.add(bar);
   });
@@ -517,7 +517,7 @@ function fitSize(text, max, width) {
   do { x.font = `700 ${s}px ${FONT}`; s -= 2; } while (x.measureText(text).width > width && s > 18);
   return s + 2;
 }
-function textTexture(lines, { w, h, bg = '#ebe4d6' }) {
+function textTexture(lines, { w, h, bg = '#ffffff' }) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   const x = c.getContext('2d');
