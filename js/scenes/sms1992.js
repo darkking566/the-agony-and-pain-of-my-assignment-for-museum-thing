@@ -2,8 +2,7 @@
 // 字幕和解說文字在 js/data.js 的 scenes['orbitel-901']；這裡只負責場景和動作。
 // 每段演出的 update(t, T) 只依照時間 t 算出所有人的狀態，所以可以直接「跳過」到任何時間點。
 import * as THREE from 'three';
-import { V, span, lerp, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
-import { buildPhone } from '../hall3d.js';
+import { V, span, lerp, box, cyl, sign, Person } from '../scene-kit.js';
 import { richRoom, windowView, leafyPlant, framedPicture, blobShadow } from './props.js';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -166,60 +165,32 @@ export function build({ scene, phone }) {
   const COWORKER_SPOT = V(3.0, 0, 1.75);
   const KEY2 = V(3.0, 0.86, 1.05);
   people.forEach((p) => { const b = blobShadow(0.9, 0.7, 0.45); b.position.y = 0.012; p.root.add(b); });
-  const BOSS_SPOT = V(2.4, 0, -1.6);
-  const GW_SPOT = V(1.2, 0, -2.2), GM_SPOT = V(3.6, 0, -1.4);
+  const BOSS_SPOT = V(3.15, 0, -2.0);
+  const GW_SPOT = V(1.0, 0, -2.3), GM_SPOT = V(4.2, 0, -1.3);
 
-  /* ---------- 手機（主管的 1992 年手機） ---------- */
-  const dyna = new THREE.Group();
+  /* ---------- 主管身旁的電話：Orbitel 901 是「可攜式」電話（主機加電池，整機約 2.1 公斤） ----------
+     實物外型沒有可靠的描述，這裡只是示意：一台厚重的主機放在派對的桌上，
+     上面有小螢幕、話筒座與天線。它太重，不會像一般手機那樣拿在手上看。 */
+  const UNIT = V(2.35, 0.88, -2.55);
+  const unit = new THREE.Group();
   {
-    const m = buildPhone(phone);
-    const b = new THREE.Box3().setFromObject(m);
-    const c = b.getCenter(V());
-    m.position.sub(c);
-    const inner = new THREE.Group();
-    inner.add(m);
-    inner.scale.setScalar(0.17);
-    inner.position.y = -0.1;
-    inner.traverse((o) => { if (o.isMesh) o.castShadow = true; });
-    dyna.add(inner);
+    const shell = box(0.34, 0.1, 0.22, '#2c3036'); shell.position.y = 0.05; unit.add(shell);
+    const lid = box(0.32, 0.012, 0.2, '#3a4048'); lid.position.y = 0.106; unit.add(lid);
+    const lcd = box(0.13, 0.014, 0.05, '#a9bf8e'); lcd.position.set(0, 0.118, 0.06); unit.add(lcd);
+    const rest = box(0.06, 0.03, 0.16, '#1b1d21'); rest.position.set(-0.1, 0.128, -0.01); unit.add(rest);
+    const handset = box(0.045, 0.03, 0.15, '#26292e'); handset.position.set(-0.1, 0.155, -0.01); unit.add(handset);
+    const grip = box(0.1, 0.02, 0.02, '#1b1d21'); grip.position.set(0, 0.06, 0.125); unit.add(grip);
+    const ant = cyl(0.006, 0.006, 0.32, '#202226', 6); ant.position.set(0.14, 0.26, -0.08); unit.add(ant);
   }
-  scene.add(dyna);
-  const handHold = new THREE.Object3D();
-  handHold.position.set(0, 0.1, 0.06);
-  boss.arms.R.grip.add(handHold);
-  const chest = new THREE.Object3D();
-  chest.rotation.set(0.6, Math.PI, 0);
-  chest.position.set(-0.08, 1.3, 0.36);   // 胸前的位置（相對於身體）
-  boss.root.add(chest);
-  const anchors = { ear: boss.ear.R, chest, hand: handHold };
-  const gripOf = {
-    ear: () => boss.ear.R.localToWorld(V(0, -0.11, -0.06)),
-    chest: () => chest.localToWorld(V(0, -0.14, -0.04)),
-    hand: () => boss.local(-0.3, 0.84, 0.08)
-  };
-  const poleOf = {
-    ear: () => boss.local(-0.75, 0.75, 0.3),
-    chest: () => boss.local(-0.6, 0.85, 0.1),
-    hand: () => boss.local(-0.5, 0.6, -0.1)
-  };
-  let phonePose = { from: 'hand', to: 'hand', k: 0 };
-  function setPhone(from, to, k) {
-    phonePose = { from, to, k };
-    if (from === 'hand' && to === 'hand') { boss.reach.R = null; return; }
-    boss.reach.R = {
-      target: () => gripOf[from]().lerp(gripOf[to](), k),
-      pole: () => poleOf[from]().lerp(poleOf[to](), k)
-    };
-  }
-  function placePhone() {
-    const { from, to, k } = phonePose;
-    if (from === 'hand') placeBetween(dyna, handHold, anchors[to], span(k, 0.6, 1));
-    else if (to === 'hand') placeBetween(dyna, anchors[from], handHold, span(k, 0, 0.4));
-    else placeBetween(dyna, anchors[from], anchors[to], k);
-  }
+  unit.position.copy(UNIT);
+  scene.add(unit);
+  const LCD = () => unit.localToWorld(V(0, 0.13, 0.06));
+  const TOUCH = () => unit.localToWorld(V(0.08, 0.12, 0.1));
+  const restGrip = () => boss.local(-0.3, 0.84, 0.08);
 
   const head = (p) => p.head.localToWorld(V(0, 0.12, 0));
   const faceTo = (p, t) => Math.atan2(t.x - p.pos.x, t.z - p.pos.z);
+  const lerpAngle = (a, b, k) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * k;
   const idle = (p, T, ph = 0) => { p.headTilt = Math.sin(T * 1.7 + ph) * 0.05; p.bob = Math.sin(T * 1.1 + ph) * 0.006; };
   const KEYBOARD = V(-1.8, 0.86, DESK_Z + 0.3);
   const ENTER = V(-1.55, 0.86, DESK_Z + 0.36);
@@ -249,7 +220,6 @@ export function build({ scene, phone }) {
           target: () => KEYBOARD.clone().add(V(Math.sin(T * 11) * 0.03, 0, typing ? Math.cos(T * 9) * 0.02 : 0)),
           pole: () => eng.local(0.6, 0.7, -0.2)
         };
-        setPhone('hand', 'hand', 0);
         partyIdle(T);
         boss.reset(); boss.pos.copy(BOSS_SPOT); boss.yaw = faceTo(boss, V(-1.8, 0, 0));
         boss.bob = Math.sin(T * 1.1) * 0.006;
@@ -267,25 +237,23 @@ export function build({ scene, phone }) {
         };
         if (t > 4.6) eng.reach.R = null;
         eng.lean = t > 4.6 ? -0.05 * span(t, 4.6, 5.4) : 0;
-        setPhone('hand', 'hand', 0);
         partyIdle(T);
         boss.reset(); boss.pos.copy(BOSS_SPOT); boss.yaw = faceTo(boss, V(-1.8, 0, 0));
       }
     },
-    // 派對上，主管的手機響了一下，螢幕上出現那行字
+    // 派對上，桌上的電話響了一下，主管走近、彎下腰，看見螢幕上出現那行字
     party: {
       duration: 10,
       update(t, T) {
         engAtDesk(T);
-        setPhone('hand', 'hand', 0);
-        boss.reset(); boss.pos.copy(BOSS_SPOT); boss.yaw = faceTo(boss, V(-1.8, 0, 0));
-        // 手機響了：主管低頭看一眼口袋裡的手機，旁邊的人也轉頭看他
-        const ring = span(t, 1.4, 1.8) * (1 - span(t, 2.6, 3.0));
-        if (ring > 0) { boss.look = dyna.getWorldPosition(V()); boss.lookAmt = ring; }
-        const raise = span(t, 2.4, 3.6);
-        setPhone('hand', 'chest', raise);
-        if (t >= 3.6) setPhone('chest', 'chest', 0);
-        if (t >= 3.6) boss.look = dyna.getWorldPosition(V()), boss.lookAmt = span(t, 3.6, 4.4);
+        boss.reset(); boss.pos.copy(BOSS_SPOT);
+        const toNeil = faceTo(boss, V(-1.8, 0, 0)), toUnit = faceTo(boss, UNIT);
+        const ring = span(t, 1.4, 1.8) * (1 - span(t, 2.6, 3.0));   // 電話響了：主管轉頭看一眼
+        const lean = span(t, 2.6, 3.8);                              // 轉身、彎下腰看螢幕
+        boss.yaw = lerpAngle(toNeil, toUnit, Math.max(ring * 0.5, lean));
+        if (ring > 0 || lean > 0) { boss.look = LCD(); boss.lookAmt = Math.max(ring, lean); }
+        boss.lean = 0.32 * lean;
+        if (lean > 0) boss.reach.R = { target: () => restGrip().lerp(TOUCH(), lean), pole: () => boss.local(-0.6, 0.9, 0.2) };
         idle(boss, T, 2);
         partyIdle(T);
         guestW.look = head(boss); guestW.lookAmt = 0.4;
@@ -296,7 +264,6 @@ export function build({ scene, phone }) {
 
   function finish() {
     people.forEach((p) => p.apply());
-    placePhone();
   }
 
   /* ---------- 螢幕特寫：電腦與手機 ---------- */
@@ -361,21 +328,21 @@ export function build({ scene, phone }) {
     insets: {
       desk: { aspect: 1.6, tone: 'phone', label: '電腦螢幕', draw: (c, W, H, t) => monitorInset(c, W, H, t) },
       send: { aspect: 1.6, tone: 'phone', label: '電腦螢幕', draw: (c, W, H, t) => monitorInset(c, W, H, t) },
-      party: { aspect: 1.25, tone: 'lcd', label: '手機螢幕', draw: (c, W, H, t) => phoneInset(c, W, H, t) }
+      party: { aspect: 1.25, tone: 'lcd', label: '電話螢幕', draw: (c, W, H, t) => phoneInset(c, W, H, t) }
     },
     focus: {
       desk: () => MONITOR_CENTER.clone(),
       neil: () => head(eng),
       pc: () => MONITOR_CENTER.clone(),
       boss: () => head(boss),
-      phone: () => dyna.getWorldPosition(V()),
+      phone: () => unit.localToWorld(V(0, 0.12, 0)),
       party: () => head(boss).lerp(head(guestW), 0.35)
     },
     hotspots: {
       pc: { pos: () => MONITOR_CENTER.clone().add(V(0, 0.45, 0)), size: 0.5 },
       party: { pos: () => head(boss).add(V(0, 0.45, 0)), size: 0.5 },
-      phone: { pos: () => dyna.localToWorld(V(0, 0.06, 0)), size: 0.42 },
-      sms: { pos: () => dyna.localToWorld(V(0, 0.42, 0)), size: 0.3 }
+      phone: { pos: () => unit.localToWorld(V(0, 0.24, 0)), size: 0.45 },
+      sms: { pos: () => LCD().add(V(0, 0.12, 0)), size: 0.3 }
     }
   };
 }
