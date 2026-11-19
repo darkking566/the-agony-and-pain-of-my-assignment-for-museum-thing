@@ -1,7 +1,7 @@
 // 展覽內容資料：2D 時間軸與 3D 展廳共用這一份。
 // 要改文字、加手機、換照片，改這個檔案就好。
 // 照片：目前先用自動產生的佔位圖。有照片時，把圖片放進 images/ 資料夾，並把該手機的 img 改成 'images/檔名.jpg' 即可。
-// shape：3D 展廳用來決定模型外型，可用 brick / car / flip / clam / candybar / slider / touch / phablet / modern
+// shape：3D 展廳用來決定模型外型，可用 brick / car / flip / clam / candybar / slider / touch / phablet / modern / radio（背負式電台）/ simon（IBM Simon）
 
 window.MUSEUM = {
   eras: [
@@ -81,7 +81,7 @@ window.MUSEUM = {
   phones: [
     {
       id: 'scr-300', era: '1940s', year: 1942, name: 'SCR-300 背負式無線對講機',
-      shape: 'brick', color: '#4a5a3a', exhibit: true, imgNote: '此展品目前沒有照片，外型為依史料的示意模型。',
+      shape: 'radio', color: '#4a5a3a', exhibit: true, imgNote: '此展品目前沒有照片。3D 模型是依背負式電台的外型示意，細節已簡化。',
       feature: '美軍二戰期間使用的無線對講機，士兵不必拉電線，就能在移動中通話',
       look: '大型機器，背在背上，拉出一根長天線，搭配一支手持話筒'
     },
@@ -117,13 +117,13 @@ window.MUSEUM = {
     },
     {
       id: 'orbitel-901', era: '1990s', year: 1992, name: 'Orbitel 901（第一則簡訊的接收機）',
-      shape: 'brick', color: '#3a3f45', exhibit: true, imgNote: '此展品目前沒有照片，外型為依史料的示意模型。',
+      shape: 'brick', color: '#3a3f45', exhibit: true, imgNote: '此展品目前沒有照片。3D 展廳的模型只是通用的「早期大型手機」造型，不是它的實物外型。',
       feature: '據記載，全世界第一則簡訊（1992 年 12 月）收到的就是這一類手機',
-      look: '外型厚重，像一塊磚頭，據報導重約兩公斤，螢幕只能顯示幾行文字'
+      look: '屬於「可攜式」電話，不是能放進口袋的手持機：整機據報導約 2.1 公斤，光是電池單元就約 9×19×29 公分'
     },
     {
       id: 'ibm-simon', era: '1990s', year: 1994, name: 'IBM Simon Personal Communicator',
-      shape: 'touch', color: '#2a2d33', exhibit: true, imgNote: '此展品目前沒有照片，外型為依史料的示意模型。',
+      shape: 'simon', color: '#2a2d33', exhibit: true, imgNote: '此展品目前沒有照片。3D 模型依「厚重的長條機身、直立的觸控螢幕、附觸控筆」示意，細節已簡化。',
       feature: '一般認為是最早的智慧型手機之一，用觸控筆點選觸控螢幕',
       look: '外型厚重，正面是觸控螢幕，附有一支觸控筆，沒有實體鍵盤'
     },

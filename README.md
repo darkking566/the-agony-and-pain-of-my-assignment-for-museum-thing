@@ -8,7 +8,7 @@
 - **參觀護照、推薦路線、心理測驗、人物頁**
 - **資料核對表**（`facts.html`）：每個說法的出處、哪些各來源不一、哪些還沒查證
 
-線上版以 Claude Artifact 發布，這個 repo 是它的完整原始碼（與線上版逐檔相同）。
+線上版以 Claude Artifact 發布，這個 repo 是它的完整原始碼。repo 的內容可能比線上版新，發布到 Artifact 之前，以 repo 為準。
 
 ## 在本機執行
 
@@ -35,7 +35,7 @@ js/
 
 ## 新增一個沉浸場景
 
-1. **展品**：在 `js/data.js` 的 `phones` 加一筆（`id`、`era`、`year`、`shape`、`feature`、`look`），**依年份排序**插入，展廳、橫幅與前後導覽都照陣列順序走。
+1. **展品**：在 `js/data.js` 的 `phones` 加一筆（`id`、`era`、`year`、`shape`、`feature`、`look`），**依年份排序**插入，展廳、橫幅與前後導覽都照陣列順序走。`shape` 決定 3D 展廳的模型，沒有合適造型時，在 `js/phones3d.js` 新增一個 builder 並登錄到 `BUILDERS`、`TIER`。
 2. **場景檔**：新增 `js/scenes/<名稱>.js`，匯出 `build({ scene, phone })`，回傳：
    - `beats`：每一段演出 `{ duration, update(t, T) }`，只依時間 `t` 算出所有人的狀態，所以可以跳到任何時間點
    - `view`、`focus`、`hotspots`、`ambient`、`finish`，需要手機螢幕特寫時再加 `insets`
@@ -47,12 +47,13 @@ js/
 ## 內容注意事項
 
 - 場景是「情境重現」：時間、地點、人物身分依史料，街上的人與情節是虛構的，頁面上有標示。
-- 沒有照片的展品（SCR-300、Orbitel 901、IBM Simon）在展廳用的是依外型示意的通用模型，並已在展品頁註明。
+- 沒有照片的展品（SCR-300、Orbitel 901、IBM Simon）都已在展品頁註明：SCR-300 與 Simon 在展廳有專用的示意造型（`js/phones3d.js` 的 `radio`、`simon`），Orbitel 901 仍是通用造型。
 - 新增或修改說法時，請同步更新 `js/facts.js`，狀態分 `ok`（已核對）、`diff`（來源不一）、`todo`（待查證）。
 
 ## 已知待辦
 
-- 3D 展廳的 SCR-300、Simon、Orbitel 模型是通用造型，不是實物外型
+- Orbitel 901 的 3D 模型仍是通用造型：查不到可靠的外型描述，它其實是約 2 公斤的「可攜式」電話
+- 1992 場景裡主管像拿一般手機的畫面，與 Orbitel 901 是可攜式電話不符
 - 1973 年街景使用八〇年代風格的轎車
 - 街景類場景（1973、1982、1984）載入較慢，尚未在實機上量測
 - 時間軸事件仍寫「MicroTAC 翻蓋手機」，與場景使用的「半掀蓋」用詞略有不同

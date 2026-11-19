@@ -12,12 +12,12 @@ const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x
 
 // 螢幕上的圖示位置（設計座標 320×240），同時也是觸控筆點的位置
 const ICONS = [
-  { name: '行事曆', x: 62, y: 70, ox: -0.05, oy: 0.025 },
-  { name: '通訊錄', x: 160, y: 70, ox: 0, oy: 0.025 },
-  { name: '郵件', x: 258, y: 70, ox: 0.05, oy: 0.025 },
-  { name: '傳真', x: 62, y: 170, ox: -0.05, oy: -0.02 },
-  { name: '待辦', x: 160, y: 170, ox: 0, oy: -0.02 },
-  { name: '記事', x: 258, y: 170, ox: 0.05, oy: -0.02 }
+  { name: '行事曆', x: 62, y: 70, ox: -0.03, oy: 0.05 },
+  { name: '通訊錄', x: 160, y: 70, ox: 0, oy: 0.05 },
+  { name: '郵件', x: 258, y: 70, ox: 0.03, oy: 0.05 },
+  { name: '傳真', x: 62, y: 170, ox: -0.03, oy: 0.0 },
+  { name: '待辦', x: 160, y: 170, ox: 0, oy: 0.0 },
+  { name: '記事', x: 258, y: 170, ox: 0.03, oy: 0.0 }
 ];
 const CAL = ICONS[0], MAIL = ICONS[2];
 

@@ -168,6 +168,11 @@ const WALLS = {
   'htc-dream': ['#0f172a', '#14532d'], 'galaxy-note': ['#0f2b3b', '#1e1b4b'], 'galaxy-s24': ['#6b5b8a', '#1e1b4b']
 };
 const CLASSIC = ['iphone', 'iphone4', 'iphone5s'];
+// IBM Simon 功能選單（內容為示意）
+const SIMON_APPS = [
+  ['行事曆', '今天 14:00　開會'], ['通訊錄', '王先生　555-0142'], ['電子郵件', '1 封新郵件'],
+  ['傳真', '傳送中… 第 1／2 頁'], ['待辦事項', '回覆客戶來信'], ['記事本', '週五前交報告']
+];
 
 function roundPath(x, l, t, w, h, r) { x.beginPath(); x.roundRect ? x.roundRect(l, t, w, h, r) : x.rect(l, t, w, h); }
 const pad2 = (n) => String(n).padStart(2, '0');
@@ -183,10 +188,10 @@ class Screen {
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({
       map: this.tex, emissiveMap: this.tex, emissive: '#ffffff', emissiveIntensity: 0.8, roughness: 0.25, envMapIntensity: 0.5
     }));
-    this.touch = kind === 'ios' || kind === 'android';
+    this.touch = kind === 'ios' || kind === 'android' || kind === 'simon';
     this.reset();
   }
-  reset() { this.on = true; this.mode = this.touch ? 'lock' : 'idle'; this.num = ''; this.msg = ''; this.msgT = 0; this.app = ''; this.appT = 0; this.light = false; this.snake = null; this.redraw(); }
+  reset() { this.on = true; this.mode = this.touch ? (this.kind === 'simon' ? 'home' : 'lock') : 'idle'; this.num = ''; this.msg = ''; this.msgT = 0; this.app = ''; this.appT = 0; this.light = false; this.snake = null; this.redraw(); }
   redraw() { this.draw(); this.tex.needsUpdate = true; }
   toggleOn() { this.on = !this.on; if (!this.on && this.mode === 'snake') this.mode = 'idle'; this.redraw(); return this.on; }
   poke() { if (!this.on) { this.on = true; this.redraw(); } }
@@ -212,6 +217,7 @@ class Screen {
   tap(u, v) {
     if (!this.touch) return;
     this.poke();
+    if (this.kind === 'simon') { this.tapSimon(u, v); return; }
     const W = this.c.width, H = this.c.height, px = u * W, py = (1 - v) * H;
     if (this.mode === 'lock') this.mode = 'home';
     else if (this.mode === 'app') this.mode = 'home';
@@ -225,7 +231,7 @@ class Screen {
     this.redraw();
   }
   homeButton() {
-    if (!this.touch) return;
+    if (!this.touch || this.kind === 'simon') return;
     this.poke();
     this.mode = this.mode === 'home' ? 'lock' : 'home';
     this.redraw();
@@ -283,6 +289,7 @@ class Screen {
       if (this.kind === 'led') this.drawLED(x, W, H);
       else if (this.kind === 'lcd') this.drawLCD(x, W, H);
       else if (this.kind === 'color') this.drawColor(x, W, H);
+      else if (this.kind === 'simon') this.drawSimon(x, W, H);
       else this.drawTouch(x, W, H);
       x.restore();
     }
@@ -296,6 +303,38 @@ class Screen {
       } else { x.beginPath(); x.arc(W / 2, this.notch.y, this.notch.r, 0, 6.3); x.fill(); x.strokeStyle = 'rgba(80,100,140,.5)'; x.lineWidth = 1.5; x.stroke(); }
     }
     x.restore();
+  }
+  /* ----- IBM Simon：單色觸控的功能選單（2 欄 × 3 列） ----- */
+  simonCells() { const W = this.c.width, H = this.c.height, top = 62; return { x0: 10, top, cw: (W - 20) / 2, ch: (H - top - 12) / 3 }; }
+  tapSimon(u, v) {
+    const W = this.c.width, H = this.c.height, px = u * W, py = (1 - v) * H;
+    if (this.mode === 'app') { this.mode = 'home'; this.redraw(); return; }
+    const g = this.simonCells();
+    SIMON_APPS.forEach((a, i) => {
+      const cx = g.x0 + (i % 2) * g.cw, cy = g.top + Math.floor(i / 2) * g.ch;
+      if (px >= cx && px < cx + g.cw && py >= cy && py < cy + g.ch) { this.mode = 'app'; this.app = a; this.appT = 4; }
+    });
+    this.redraw();
+  }
+  drawSimon(x, W, H) {
+    const ink = '#1f261c';
+    x.fillStyle = '#d4dccb'; x.fillRect(0, 0, W, H);
+    x.fillStyle = ink; x.textBaseline = 'middle'; x.textAlign = 'center';
+    if (this.mode === 'app' && this.app) {
+      x.font = `bold 34px ${FONT}`; x.fillText(this.app[0], W / 2, H * 0.3);
+      x.fillRect(20, H * 0.3 + 28, W - 40, 3);
+      x.font = `600 20px ${FONT}`; x.fillText(this.app[1], W / 2, H * 0.3 + 70);
+      x.font = `500 15px ${FONT}`; x.fillText('輕觸螢幕回到選單', W / 2, H - 30);
+      return;
+    }
+    x.font = `bold 24px ${FONT}`; x.fillText('IBM Simon', W / 2, 26);
+    x.fillRect(10, 46, W - 20, 3);
+    const g = this.simonCells();
+    SIMON_APPS.forEach((a, i) => {
+      const cx = g.x0 + (i % 2) * g.cw + 5, cy = g.top + Math.floor(i / 2) * g.ch + 6;
+      x.lineWidth = 3; x.strokeStyle = ink; roundPath(x, cx, cy, g.cw - 10, g.ch - 12, 8); x.stroke();
+      x.font = `bold 19px ${FONT}`; x.fillText(a[0], cx + (g.cw - 10) / 2, cy + (g.ch - 12) / 2);
+    });
   }
   drawLED(x, W, H) {
     x.fillStyle = '#150505'; x.fillRect(0, 0, W, H);
@@ -721,7 +760,100 @@ function touchPhone(rig, p) {
 /* ====================================================================
    分解檢視：把機身拆成真的零件（後蓋、電池、主機板、螢幕模組⋯⋯）
    ==================================================================== */
-const TIER = { brick: 'analog', car: 'analog', flip: 'analog', clam: 'digital', candybar: 'digital', slider: 'smart', touch: 'smart', modern: 'smart', phablet: 'smart' };
+/* ====================================================================
+   展品專用造型：IBM Simon（長條觸控機）、SCR-300（背負式電台）
+   這兩件沒有照片，造型是依介紹文字示意的，細節已簡化。
+   ==================================================================== */
+function simon(rig, p) {
+  const W = 0.36, H = 1.12, D = 0.17, F = rig.front;
+  const body = plastic(p.color, { roughness: 0.5 }), dark = plastic('#0d0e11', { roughness: 0.35 });
+  slabs(rig, { W, H, D, r: 0.035, back: body, front: body });
+  rig.batteryLabel = 'BATTERY';
+  const zf = D / 2, sw = 0.29, sh = sw * 293 / 160, sy = 0.1;   // 螢幕解析度 160×293，直立
+  F.add(at(rbox(W * 0.92, sh + 0.1, 0.012, dark, 0.02), 0, sy, zf + 0.003));
+  addScreen(rig, F, 'simon', sw, sh, V(0, sy, zf + 0.0095));
+  F.add(at(rbox(0.1, 0.012, 0.006, dark, 0.004), 0, H * 0.47, zf + 0.002));
+  F.add(at(new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16 * 96 / 256), new THREE.MeshBasicMaterial({ map: labelTex('SIMON', '#cfd3d8', '#17181c') })), 0, -H * 0.4, zf + 0.0035));
+  // 觸控筆：平時貼在機身右側，可以拔出來
+  const pen = new THREE.Group();
+  pen.add(cyl(0.011, 0.011, 0.5, plastic('#1b1c20', { roughness: 0.4 })));
+  pen.add(at(cyl(0.003, 0.011, 0.05, metal('#b8bcc4', { roughness: 0.3 }), 10), 0, -0.275, 0));
+  F.add(pen);
+  rig.state('pen', 0);
+  rig.upd.push((s) => { pen.position.set(W / 2 + 0.008 + 0.16 * s.pen, 0.16 * s.pen, 0.02 + 0.26 * s.pen); pen.rotation.set(0, 0, 0.55 * s.pen); });
+  rig.action('pen', () => (rig.t.pen > 0.5 ? '收回觸控筆' : '拔出觸控筆'), () => rig.flip('pen'));
+  rig.pin(F, V(0, sy, zf + 0.02), 1, '單色觸控螢幕', '約 4.5 吋的單色螢幕，上面疊一層電阻式觸控層：用筆尖或手指壓下去才會有反應。點點看螢幕上的圖示。');
+  rig.pin(pen, V(0, 0.1, 0.02), 1, '隨機附的觸控筆', '機器附一支觸控筆。電阻式螢幕用尖的筆頭比手指準，不過用手指也能操作。點「拔出觸控筆」看看。');
+  rig.pin(F, V(0, -H * 0.4, zf + 0.012), 1, '續航很有限', '電池通話只能撐約 1 小時，充電要 14 至 16 小時。');
+}
+
+function radio(rig, p) {
+  const W = 0.58, H = 0.78, D = 0.3, F = rig.front, B = rig.back;
+  const body = plastic(p.color, { roughness: 0.7 }), panel = plastic(shade(p.color, -0.14), { roughness: 0.6 });
+  const dark = plastic('#14170f', { roughness: 0.5 }), steel = metal('#b9bcb4', { roughness: 0.35 });
+  slabs(rig, { W, H, D, r: 0.03, back: body, front: body });
+  rig.batteryLabel = 'BA-70';
+  const zf = D / 2;
+  F.add(at(rbox(W * 0.9, H * 0.9, 0.008, panel, 0.01), 0, 0, zf + 0.002));
+  // 調頻撥盤：點一下會轉動
+  const knob = new THREE.Group(); knob.position.set(-0.12, 0.12, zf + 0.012);
+  const dial = axisZ(cyl(0.12, 0.12, 0.022, steel, 28)); knob.add(dial);
+  knob.add(at(axisZ(cyl(0.085, 0.085, 0.004, dark, 28)), 0, 0, 0.012));
+  knob.add(at(rbox(0.014, 0.1, 0.006, plastic('#e8e6d8'), 0.003), 0, 0.045, 0.016));
+  F.add(knob);
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2, t = at(rbox(0.006, 0.018, 0.004, plastic('#e8e6d8'), 0.002), -0.12 + Math.cos(a) * 0.14, 0.12 + Math.sin(a) * 0.14, zf + 0.008);
+    t.rotation.z = a - Math.PI / 2; F.add(t);
+  }
+  rig.state('tune', 0);
+  rig.upd.push((s) => { knob.rotation.z = -s.tune * 0.8; });
+  rig.tap(dial, () => { rig.t.tune += 1; });
+  [[0.15, 0.2], [0.15, 0.03]].forEach(([x, y]) => F.add(at(axisZ(cyl(0.04, 0.04, 0.03, steel, 20)), x, y, zf + 0.014)));
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => F.add(at(axisZ(cyl(0.012, 0.012, 0.008, steel, 10)), sx * W * 0.4, sy * H * 0.4, zf + 0.008)));
+  F.add(at(new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3 * 96 / 256), new THREE.MeshBasicMaterial({ map: labelTex('SCR-300', '#e9e7d6', '#1f2418') })), 0.04, -0.22, zf + 0.0065));
+  F.add(at(axisZ(cyl(0.022, 0.022, 0.02, dark, 16)), W / 2 - 0.07, -H * 0.38, zf + 0.012));   // 話筒插孔
+  // 背面：背架與肩帶
+  B.add(at(rbox(W * 0.84, H * 0.8, 0.014, dark, 0.012), 0, -0.02, -D / 2 - 0.006));
+  [-0.15, 0.15].forEach((x) => B.add(at(rbox(0.07, H * 1.0, 0.012, plastic('#5d5b45', { roughness: 0.9 }), 0.006), x, -0.05, -D / 2 - 0.018)));
+  // 天線：可以拉出、收起
+  B.add(at(cyl(0.045, 0.05, 0.1, rubber('#14170f')), -0.2, H / 2 + 0.04, -0.02));
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1, 12), metal('#8d9096')); B.add(rod);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 10), rubber('#1a1a1a')); B.add(tip);
+  rig.state('ext', 1);
+  rig.upd.push((s) => { const len = 0.1 + 0.4 * s.ext; rod.scale.y = len; rod.position.set(-0.2, H / 2 + 0.09 + len / 2, -0.02); tip.position.set(-0.2, H / 2 + 0.09 + len, -0.02); });
+  rig.action('ant', () => (rig.t.ext > 0.5 ? '收起天線' : '拉出天線'), () => rig.flip('ext'));
+  // 話筒：用線接到機身，可以拿起
+  const hs = new THREE.Group(), hm = plastic('#1f2218', { roughness: 0.5 });
+  hs.add(rbox(0.07, 0.3, 0.055, hm, 0.025));
+  hs.add(at(rbox(0.1, 0.085, 0.085, hm, 0.03), 0, 0.2, 0.012));
+  hs.add(at(rbox(0.1, 0.075, 0.085, hm, 0.03), 0, -0.2, 0.012));
+  const ptt = at(rbox(0.03, 0.12, 0.014, plastic('#0c0d09'), 0.005), 0, 0, 0.034); hs.add(ptt);
+  F.add(hs);
+  rig.tap(ptt, rig.pressable(ptt, V(0, 0, 1), 0.01, () => beep('PTT')));
+  F.add(at(rbox(0.03, 0.1, 0.04, steel, 0.01), W / 2 + 0.03, 0.12, 0.02));
+  const cordM = rubber('#1c1c1c');
+  let cord = null, lastKey = '';
+  rig.state('hand', 0);
+  rig.upd.push((s) => {
+    hs.position.set(W / 2 + 0.075 + 0.2 * s.hand, 0.02 + 0.26 * s.hand, 0.03 + 0.2 * s.hand);
+    hs.rotation.z = -0.8 * s.hand;
+    const key = s.hand.toFixed(3) + s.explode.toFixed(3);
+    if (key === lastKey) return; lastKey = key;
+    const end = V(0, -0.18, 0).applyEuler(hs.rotation).add(hs.position); end.z += rig.front.position.z;
+    const st = V(W / 2 - 0.07, -H * 0.38, zf + 0.012);
+    const m = st.clone().lerp(end, 0.5); m.y -= 0.16; m.z += 0.1;
+    const curve = new THREE.CatmullRomCurve3([st, st.clone().add(V(0.03, -0.07, 0.05)), m, end]);
+    const g = new THREE.TubeGeometry(curve, 28, 0.009, 6);
+    if (cord) { cord.geometry.dispose(); cord.geometry = g; } else { cord = new THREE.Mesh(g, cordM); rig.root.add(cord); }
+  });
+  rig.action('hand', () => (rig.t.hand > 0.5 ? '放回話筒' : '拿起話筒'), () => rig.flip('hand'));
+  rig.pin(F, V(-0.12, 0.12, zf + 0.03), 1, '調頻撥盤', '轉動撥盤來選擇要用的頻道。點撥盤，它會轉動。');
+  rig.pin(B, V(-0.2, H / 2 + 0.3, -0.02), 0, '長天線', '天線拉出來才收發得好。通話距離約 3 英里（約 4.8 公里），依地形與天線而定。點「收起天線」看看。');
+  rig.pin(hs, V(0, 0.2, 0.06), 1, '話筒', '話筒用一條線接到機身。話筒上有通話鍵：按住說話、放開收聽（這一類對講機的典型用法）。點「拿起話筒」，再點通話鍵。');
+  rig.pin(F, V(0.04, -0.22, zf + 0.02), 1, '背著走的電台', '連電池約 15 公斤上下（依電池而不同），所以要用背架和肩帶背在背上。');
+}
+
+const TIER = { brick: 'analog', car: 'analog', flip: 'analog', clam: 'digital', candybar: 'digital', slider: 'smart', touch: 'smart', modern: 'smart', phablet: 'smart', radio: 'analog', simon: 'digital' };
 const SIM_IDS = ['nokia-3210', 'nokia-3310', 'siemens-s10', 'iphone', 'htc-dream', 'iphone4', 'iphone5s', 'iphone12', 'galaxy-note', 'galaxy-s24'];
 const PART_COLORS = {
   back: '#94a3b8', coil: '#f59e0b', battery: '#22c55e', camera: '#a855f7', antenna: '#eab308', sim: '#06b6d4', pen: '#f472b6', frame: '#64748b',
@@ -756,7 +888,29 @@ function labelTex(text, fg = '#e9edf2', bg = '#2b3038') {
 }
 
 // 每個零件的名稱與說明
+// 專用造型的零件說明（避免套用手機的通用說明，例如鋰電池、Wi‑Fi 天線）
+const SHAPE_PARTS = {
+  radio: {
+    back: ['背面外殼', '背面連著背架和肩帶，讓人可以把整台電台背在背上。'],
+    front: ['前面板', '撥盤、旋鈕和話筒的插孔都在這一面。'],
+    frame: ['機身骨架', '電台的框架，收發電路和電池都固定在這裡。'],
+    battery: ['電池（BA-70／BA-80）', '專用電池有兩種：BA-70 約 6.8 公斤、可用約 20 至 25 小時；BA-80 輕約 2.7 公斤，但只能用約 12 至 15 小時。'],
+    board: ['收發電路', '把聲音轉成無線電波送出去、再把收到的訊號還原成聲音的電路，都在這一塊。']
+  },
+  simon: {
+    back: ['後殼', '塑膠後殼，機身又厚又重。'],
+    front: ['前面板', '正面大半是觸控螢幕。'],
+    frame: ['中框', '機身的骨架，電路板和電池固定在這裡。'],
+    battery: ['電池', '續航很有限：通話約 1 小時，充電要 14 至 16 小時。'],
+    board: ['主機板', '電話、傳真、電子郵件和行事曆等功能的電路，都在這塊板子上。'],
+    display: ['單色觸控 LCD 模組', '160×293 像素的單色液晶，上面疊一層電阻式觸控層，壓下去才有反應。'],
+    antenna: ['天線', '負責收發行動電話訊號。']
+  }
+};
+
 function partInfo(id, p, tier) {
+  const over = SHAPE_PARTS[p.shape];
+  if (over && over[id]) return over[id];
   const modern = p.id === 'iphone12' || p.id === 'galaxy-s24';
   const backs = {
     iphone: ['鋁製後殼', '金屬背板。底部的黑色塑膠條是天線的「窗口」，讓訊號能穿過金屬。'],
@@ -824,10 +978,10 @@ function finishRig(rig) {
 
   // 電池
   if (p.shape !== 'car') {
-    const brick = p.shape === 'brick', g = mk('battery', -0.62);
+    const brick = p.shape === 'brick' || p.shape === 'radio', g = mk('battery', -0.62);
     const bw = iw * (brick ? 0.92 : 0.82), bh = ih * (brick ? 0.4 : 0.4), bt = dm * (brick ? 0.55 : 0.36), by = -ih * (brick ? 0.27 : 0.22);
     g.add(at(rbox(bw, bh, bt, plastic(smart ? '#c9ced6' : '#2c3036', { roughness: 0.45, metalness: smart ? 0.5 : 0.1 }), 0.005), 0, by, -hz + bt / 2));
-    const lab = at(new THREE.Mesh(new THREE.PlaneGeometry(bw * 0.7, bw * 0.7 * 96 / 256), new THREE.MeshBasicMaterial({ map: labelTex(tier === 'analog' ? 'Ni-Cd' : tier === 'digital' ? 'Li-ion' : 'Li-Po', smart ? '#222' : '#e9edf2', smart ? '#dfe3e8' : '#2c3036') })), 0, by, -hz + bt + 0.0008);
+    const lab = at(new THREE.Mesh(new THREE.PlaneGeometry(bw * 0.7, bw * 0.7 * 96 / 256), new THREE.MeshBasicMaterial({ map: labelTex(rig.batteryLabel || (tier === 'analog' ? 'Ni-Cd' : tier === 'digital' ? 'Li-ion' : 'Li-Po'), smart ? '#222' : '#e9edf2', smart ? '#dfe3e8' : '#2c3036') })), 0, by, -hz + bt + 0.0008);
     g.add(lab);
     g.add(at(rbox(bw * 0.2, 0.012, bt * 0.5, gold, 0.002), bw * 0.25, by + bh / 2 + 0.006, -hz + bt * 0.5));
     if (p.id === 'iphone5s' || p.id === 'iphone12') [-0.25, 0.25].forEach((fx) => g.add(at(rbox(0.008, bh * 0.9, 0.002, plastic('#eceff3'), 0.001), bw * fx, by - 0.01, -hz + bt + 0.0015)));
@@ -891,8 +1045,8 @@ function finishRig(rig) {
     else if (p.id !== 'iphone') { const c2 = at(cyl(0.01, 0.01, 0.01, metal('#4b5361')), sx, sy, hz - 0.006); c2.rotation.x = Math.PI / 2; g.add(c2); }
     else g.add(at(rbox(0.04, 0.012, 0.006, dark, 0.003), 0, sy, hz - 0.005));
   }
-  // 喇叭、麥克風
-  {
+  // 喇叭、麥克風（背負式電台的聽筒與麥克風在話筒裡，機身內沒有）
+  if (p.shape !== 'radio') {
     const g = mk('audio', 0.14);
     g.add(at(rbox(0.07, 0.012, 0.008, metal('#7c828c'), 0.003), 0, ih / 2 - 0.02, hz * 0.4));
     g.add(at(rbox(iw * 0.3, 0.022, 0.012, dark, 0.004), iw * 0.22, -ih / 2 + 0.025, hz * 0.3));
@@ -962,7 +1116,7 @@ function finishRig(rig) {
   parts.sort((a, b) => a.k - b.k);
 }
 
-const BUILDERS = { brick, car, flip, clam, candybar, slider, phablet, touch: touchPhone, modern: touchPhone };
+const BUILDERS = { brick, car, flip, clam, candybar, slider, phablet, touch: touchPhone, modern: touchPhone, radio, simon };
 
 export function buildPhone(p) {
   const rig = new Rig(p);

@@ -909,6 +909,56 @@ window.FACTS = [
     "https://www.engadget.com/2010/06/07/iphone-4-announced/"
    ]
   ]
+ },
+ {
+  "item": "SCR-300 背負式無線對講機",
+  "claim": "專用電池 BA-70 約 6.8 公斤、可用約 20 至 25 小時；BA-80 輕約 2.7 公斤、可用約 12 至 15 小時",
+  "status": "ok",
+  "note": "3D 展廳的電池說明用這組數字。Wikipedia 的規格表也列出兩種電池的整機重量差約 6 磅（38.23 與 32.23 磅），和這裡的說法一致。",
+  "src": [
+   [
+    "SOFREP",
+    "https://sofrep.com/news/scr-300-radio-talked-clearly-drew-german-fire/"
+   ],
+   [
+    "Wikipedia：SCR-300",
+    "https://en.wikipedia.org/wiki/SCR-300"
+   ]
+  ]
+ },
+ {
+  "item": "SCR-300 背負式無線對講機",
+  "claim": "話筒上有通話鍵：按住說話、放開收聽",
+  "status": "todo",
+  "note": "這是這一類對講機的典型用法，場景與展廳的解說都這樣寫，但本次沒有找到專門談 SCR-300 話筒的出處。建議再查 SCR-300 的技術手冊（TM 11-5820 系列）。",
+  "src": []
+ },
+ {
+  "item": "Orbitel 901／第一則簡訊",
+  "claim": "Orbitel 901 是「可攜式（transportable）」電話，不是能放進口袋的手持機",
+  "status": "diff",
+  "note": "Mobile Phone Museum 列整機 2,100 公克；Science Museum 的館藏記錄中，電池單元就有 89×190×290 公釐、0.58 公斤，兩者可能指不同的組件或配置。展品頁因此只寫「據報導約 2.1 公斤」，並說明它不是手持機。",
+  "src": [
+   [
+    "Mobile Phone Museum",
+    "https://mobilephonemuseum.com/phone-detail/orbitel-901"
+   ],
+   [
+    "Science Museum Group",
+    "https://collection.sciencemuseumgroup.org.uk/objects/co8360003/orbitel-901-mobile-phone-1992"
+   ],
+   [
+    "Engaging with Communications",
+    "https://engagingwithcommunications.com/Technology/Mobiles/GSM/gsm.php"
+   ]
+  ]
+ },
+ {
+  "item": "Orbitel 901／第一則簡訊",
+  "claim": "Orbitel 901 的實物外型（3D 模型與 1992 場景裡主管手上的裝置）",
+  "status": "todo",
+  "note": "沒有找到可靠的外型描述，3D 展廳只用通用的「早期大型手機」造型，並已在展品頁註明。1992 場景裡主管像拿一般手機的畫面，與「可攜式電話」並不相符，待改。",
+  "src": []
  }
 ];
 (function () {

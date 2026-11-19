@@ -24,6 +24,8 @@
     slider:   { w: 98,  h: 170, rx: 16, scr: [12, 14, 74, 74], keys: 2, slide: true },
     touch:    { w: 104, h: 204, rx: 22, scr: [8, 36, 88, 132], home: true },
     phablet:  { w: 116, h: 216, rx: 18, scr: [8, 26, 100, 152], home: true },
+    radio:    { w: 150, h: 170, rx: 10, scr: [18, 22, 44, 44], antenna: true },
+    simon:    { w: 78,  h: 230, rx: 8,  scr: [10, 34, 58, 106] },
     modern:   { w: 100, h: 212, rx: 26, scr: [6, 6, 88, 200], cam: true }
   };
   window.placeholder = function (p) {
