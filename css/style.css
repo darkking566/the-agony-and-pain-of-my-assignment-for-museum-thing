@@ -136,9 +136,11 @@ body::before {
 .page-head .sub { margin: 0; }
 
 /* 照片佔位圖 */
-.photo { aspect-ratio: 4 / 5; width: 100%; border-radius: 8px; background: var(--alt); overflow: hidden; display: grid; place-items: center; }
+/* 相框的高度是由 aspect-ratio 推出來的，img 的 height:100% 解析不到它，高瘦的圖會依自己的比例撐大、被 overflow:hidden 切掉下半部。
+   所以讓相框當定位基準，圖片貼滿相框，由 object-fit: contain 負責完整縮進去。 */
+.photo { position: relative; aspect-ratio: 4 / 5; width: 100%; border-radius: 8px; background: var(--alt); overflow: hidden; display: grid; place-items: center; }
 .dark .photo, .pick .photo, .flip-front .photo { background: transparent; }
-.photo img { width: 100%; height: 100%; object-fit: contain; }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .photo.real, .dark .photo.real, .pick .photo.real, .flip-front .photo.real { background: #fff; }
 .photo.real img { padding: 8px; }
 
