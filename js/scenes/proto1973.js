@@ -97,21 +97,21 @@ export function build({ scene, phone }) {
     shelter.position.set(-12.2, 0, -3.2); scene.add(shelter);
   }
   // 路邊的第二輛停車
-  const parked2 = makeSedan('#3a3f4a'); parked2.position.set(-6.4, -0.15, -5.35); scene.add(parked2);
+  const parked2 = makeSedan('#6b7a3a', { ext: 0.34 }); parked2.position.set(-6.4, -0.15, -5.35); scene.add(parked2);
   const bin = cyl(0.28, 0.25, 0.9, '#3f4a3f', 12);
   bin.position.set(-6.2, 0.45, -3.9);
   scene.add(bin);
   const tree = (x, z) => leafTree(scene, x, z, (Math.abs(x * 3 + z) | 0) + 1, 1, GREEN);
   tree(-11, -3.7); tree(11.5, -3.7); tree(-16, -13.5); tree(9, -13.5);
 
-  // 路邊停著一輛普通轎車，車旁有一個停車計時器
-  const parked = makeSedan('#5b5a4a');
+  // 路邊停著一輛七〇年代的轎車（車頭車尾較長）；街上開的是紐約的黃色計程車
+  const parked = makeSedan('#a8742a', { ext: 0.34 });
   parked.position.set(6.8, -0.15, -5.35);
   scene.add(parked);
   const traffic = [
-    { c: makeSedan('#c9b98f'), z: -7.5, v: 8, off: 0 },
-    { c: makeSedan('#2f4a6b'), z: -10.4, v: -9, off: 40 },
-    { c: makeSedan('#9a8a6a'), z: -7.5, v: 7.5, off: 65 }
+    { c: makeSedan('#e8b92a', { ext: 0.3, taxi: true }), z: -7.5, v: 8, off: 0 },
+    { c: makeSedan('#e8b92a', { ext: 0.3, taxi: true }), z: -10.4, v: -9, off: 40 },
+    { c: makeSedan('#6a3a2a', { ext: 0.34 }), z: -7.5, v: 7.5, off: 65 }
   ];
   traffic.forEach((t) => { t.c.position.set(0, -0.15, t.z); if (t.v < 0) t.c.rotation.y = Math.PI; scene.add(t.c); });
 

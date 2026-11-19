@@ -270,9 +270,11 @@ export function balcony(w) {
 }
 
 /* ---------- 停在路邊的車（沒有任何動作，只是讓街看起來有車） ---------- */
-export function sedanProfile() {
-  const lower = new THREE.Shape(); // 車身下半部：側面輪廓（x 車頭方向，y 往上）
-  [[-1.75, 0.26], [2.12, 0.26], [2.16, 0.52], [2.08, 0.72], [1.2, 0.86], [-0.9, 0.88], [-1.72, 0.84], [-1.77, 0.56]].forEach(([x, y], i) => (i ? lower.lineTo(x, y) : lower.moveTo(x, y)));
+export function sedanProfile(ext = 0) {
+  const lower = new THREE.Shape(); // 車身下半部：側面輪廓（x 車頭方向，y 往上）。ext：車頭、車尾加長的長度
+  [[-1.75, 0.26], [2.12, 0.26], [2.16, 0.52], [2.08, 0.72], [1.2, 0.86], [-0.9, 0.88], [-1.72, 0.84], [-1.77, 0.56]]
+    .map(([x, y]) => [x > 1.5 ? x + ext : x < -1.5 ? x - ext : x, y])
+    .forEach(([x, y], i) => (i ? lower.lineTo(x, y) : lower.moveTo(x, y)));
   const cabin = new THREE.Shape(); // 車窗那一圈
   [[1.18, 0.86], [0.6, 1.44], [-0.5, 1.44], [-0.98, 0.88]].forEach(([x, y], i) => (i ? cabin.lineTo(x, y) : cabin.moveTo(x, y)));
   return { lower, cabin };
@@ -281,13 +283,14 @@ export function extrudeSide(shape, width, bevel = 0.04) {
   const g = new THREE.ExtrudeGeometry(shape, { depth: width - bevel * 2, bevelEnabled: true, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 2, curveSegments: 4 });
   g.translate(0, 0, -(width - bevel * 2) / 2); return g;
 }
-/** 一輛 80 年代的方正轎車（車頭朝 +x）。antenna：後車廂上加一根車用電話天線 */
-export function makeSedan(color, { antenna = false } = {}) {
+/** 一輛方正轎車（車頭朝 +x，預設是 80 年代的長度）。antenna：後車廂上加一根車用電話天線；
+ *  ext：車頭車尾各加長幾公尺（七〇年代的美國車有很長的引擎蓋和行李廂）；taxi：車頂加計程車燈、車身加條紋 */
+export function makeSedan(color, { antenna = false, ext = 0, taxi = false } = {}) {
   const g = new THREE.Group();
   const paint = new THREE.MeshPhysicalMaterial({ color, roughness: 0.4, metalness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.25 });
   const glass = new THREE.MeshPhysicalMaterial({ color: '#1b262d', roughness: 0.08, metalness: 0.1, transparent: true, opacity: 0.65 });
   const chrome = mat('#c8ccd0', { metalness: 0.85, roughness: 0.25 }), dark = mat('#1c1b1b', { roughness: 0.6 });
-  const { lower, cabin } = sedanProfile();
+  const { lower, cabin } = sedanProfile(ext);
   const body = new THREE.Mesh(extrudeSide(lower, 1.76, 0.05), paint); body.castShadow = body.receiveShadow = true; g.add(body);
   const cab = new THREE.Mesh(extrudeSide(cabin, 1.5, 0.02), glass); g.add(cab);
   const roof = box(1.14, 0.07, 1.58, paint); roof.position.set(0.05, 1.45, 0); g.add(roof);
@@ -312,13 +315,18 @@ export function makeSedan(color, { antenna = false } = {}) {
     arch.position.set(wx, 0.36, Math.sign(wz) * 0.888); if (wz < 0) arch.rotation.y = Math.PI; g.add(arch);
   });
   [0.64, -0.64].forEach((lz) => {
-    const hr = box(0.055, 0.19, 0.4, chrome); hr.position.set(2.165, 0.64, lz);
-    const h = box(0.05, 0.15, 0.36, '#fff6d8', { emissive: '#fff1c4', emissiveIntensity: 0.4 }); h.position.set(2.17, 0.64, lz);
-    const t = box(0.05, 0.14, 0.4, '#a01e18', { emissive: '#6a0c08', emissiveIntensity: 0.4 }); t.position.set(-1.78, 0.68, lz);
+    const hr = box(0.055, 0.19, 0.4, chrome); hr.position.set(2.165 + ext, 0.64, lz);
+    const h = box(0.05, 0.15, 0.36, '#fff6d8', { emissive: '#fff1c4', emissiveIntensity: 0.4 }); h.position.set(2.17 + ext, 0.64, lz);
+    const t = box(0.05, 0.14, 0.4, '#a01e18', { emissive: '#6a0c08', emissiveIntensity: 0.4 }); t.position.set(-1.78 - ext, 0.68, lz);
     g.add(hr, h, t);
   });
-  const grille = box(0.04, 0.17, 0.95, '#101214'); grille.position.set(2.18, 0.6, 0); g.add(grille);
-  const bf = box(0.14, 0.2, 1.82, chrome); bf.position.set(2.2, 0.4, 0); const br = bf.clone(); br.position.x = -1.82; g.add(bf, br);
+  const grille = box(0.04, 0.17, 0.95, '#101214'); grille.position.set(2.18 + ext, 0.6, 0); g.add(grille);
+  const bf = box(0.14, 0.2, 1.82, chrome); bf.position.set(2.2 + ext, 0.4, 0); const br = bf.clone(); br.position.x = -1.82 - ext; g.add(bf, br);
+  if (taxi) {
+    const lamp = box(0.34, 0.15, 0.62, '#f3ecc4', { emissive: '#f6e7a0', emissiveIntensity: 0.55 }); lamp.position.set(0.05, 1.56, 0); g.add(lamp);
+    const lampBase = box(0.2, 0.05, 0.4, '#2a2a2a'); lampBase.position.set(0.05, 1.5, 0); g.add(lampBase);
+    [-1, 1].forEach((sd) => { for (let i = 0; i < 14; i++) { const ck = box(0.14, 0.07, 0.012, i % 2 ? '#f2f0ea' : '#1b1b1b'); ck.position.set(-1.0 + i * 0.14, 0.62 + (i % 2) * 0.07 - 0.035, sd * 0.894); ck.castShadow = false; g.add(ck); } });
+  }
   if (antenna) {
     const rod = cyl(0.008, 0.008, 0.7, '#202020', 6); rod.position.set(-0.4, 1.8, 0.45);
     const base = cyl(0.035, 0.04, 0.03, '#202020', 8); base.position.set(-0.4, 1.48, 0.45); g.add(rod, base);

@@ -7,6 +7,8 @@ const DWELL = 1.1;   // 盯著發光點幾秒會打開解說
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export async function openExperience({ script, phone, onExit, onComplete }) {
+  // 環境反光用的小模組：一開始就下載，和場景建立同時進行，不要排在場景建好之後才開始
+  const envImport = import('three/addons/environments/RoomEnvironment.js').catch(() => null);
   /* ---------- 介面 ---------- */
   const root = document.createElement('div');
   root.className = 'imm';
@@ -111,7 +113,9 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
   renderer.toneMappingExposure = world.exposure || 1.15;
   // 環境反光：讓手機、金屬、玻璃有一點真實的反射；失敗了就算了，場景照樣能看
   try {
-    const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+    const envMod = await envImport;
+    if (!envMod) throw new Error('RoomEnvironment 模組載入失敗');
+    const { RoomEnvironment } = envMod;
     const pm = new THREE.PMREMGenerator(renderer);
     scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
     pm.dispose();
