@@ -123,7 +123,7 @@ window.MUSEUM = {
     },
     {
       id: 'ibm-simon', era: '1990s', year: 1994, name: 'IBM Simon Personal Communicator',
-      shape: 'simon', color: '#2a2d33', exhibit: true, imgNote: '此展品目前沒有照片。3D 模型依「厚重的長條機身、直立的觸控螢幕、附觸控筆」示意，細節已簡化。',
+      img: 'images/ibm-simon.webp', credit: 'Bcos47／公有領域／https://commons.wikimedia.org/wiki/File:IBM_Simon_Personal_Communicator.png', imgNote: '照片中的 Simon 放在充電座上。3D 模型依「厚重的長條機身、直立的觸控螢幕、附觸控筆」示意，細節已簡化。', shape: 'simon', color: '#2a2d33', exhibit: true,
       feature: '一般認為是最早的智慧型手機之一，用觸控筆點選觸控螢幕',
       look: '外型厚重，正面是觸控螢幕，附有一支觸控筆，沒有實體鍵盤'
     },
