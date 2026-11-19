@@ -292,6 +292,59 @@ window.MUSEUM = {
           text: '對講機讓兩個人即使不在同一個地方，也能互相通話。人不必待在固定的電話機旁，這正是行動通訊的雛形。' }
       }
     },
+    'iphone12': {
+      module: 'iphone12-2020',
+      title: '2020・居家的一通視訊',
+      intro: '2020 年秋天的傍晚，一位年輕人在家裡。桌上的 iPhone 12 吸在 MagSafe 充電座上，媽媽打來視訊。',
+      note: '情境重現：依據史料推想當時的典型情況。手機的發表時間與功能依 Apple 新聞稿，人物與通話內容為虛構。',
+      outro: { title: '一支手機，兩個新習慣', text: '5G 讓影音通話與下載更順，MagSafe 讓充電和配件不用再對準。這一代 iPhone 把這兩件事放進了日常。' },
+      beats: [
+        { type: 'play', scene: 'evening',
+          captions: [
+            { at: 0, text: '2020 年秋天，傍晚的公寓。那一年，很多人待在家裡，用視訊跟家人見面。' },
+            { at: 3.6, text: '門邊的掛勾上掛著口罩和鑰匙。年輕人走進來，走向高腳桌。' },
+            { at: 6.4, text: '桌上，一支 iPhone 12 平放在一個圓形的充電座上。' }
+          ],
+          focus: [{ at: 0, target: 'room' }, { at: 6, target: 'puck' }] },
+        { type: 'play', scene: 'pickup',
+          captions: [
+            { at: 0, text: '手機亮了起來：媽媽打來視訊。' },
+            { at: 3.4, text: '他伸手，把手機從充電座上拿起來。' },
+            { at: 5.4, text: '手機背面有一圈磁鐵，吸得住，卻不費力就能拿開。' },
+            { at: 7.4, text: '他按下接聽。' }
+          ],
+          focus: [{ at: 0, target: 'puck' }, { at: 5, target: 'phone' }] },
+        { type: 'play', scene: 'call',
+          captions: [
+            { at: 0, text: '螢幕上出現媽媽的臉。' },
+            { at: 3.2, text: 'iPhone 12 系列全部支援 5G，影音通話的畫面更順。' },
+            { at: 6.2, text: '他把手機舉高，讓媽媽看看這個房間。' }
+          ],
+          focus: [{ at: 0, target: 'phone' }, { at: 5, target: 'phone' }] },
+        { type: 'explore', hotspots: ['phone', 'network'],
+          prompt: '自由參觀：看看這支手機，還有螢幕上的 5G' },
+        { type: 'play', scene: 'end',
+          captions: [
+            { at: 0, text: '通話結束。' },
+            { at: 2.0, text: '他把手機放回充電座。' },
+            { at: 3.4, text: '磁鐵一吸，手機自己對準位置，開始充電。' },
+            { at: 6.0, text: '不用插線，也不用對準。' }
+          ],
+          focus: [{ at: 0, target: 'phone' }, { at: 3, target: 'puck' }] },
+        { type: 'explore', hotspots: ['magsafe', 'screen'],
+          prompt: '自由參觀：看看充電座，還有手機的螢幕' }
+      ],
+      hotspots: {
+        phone: { title: 'iPhone 12',
+          text: '2020 年 10 月 13 日發表，是第一款支援 5G 的 iPhone，使用 A14 仿生晶片，螢幕是 6.1 吋的 Super Retina XDR。' },
+        network: { title: '5G',
+          text: 'iPhone 12 系列的四款機型全部支援 5G。5G 的網路更快，影音通話與下載會更順；實際的速度要看電信業者和所在地的網路。' },
+        magsafe: { title: 'MagSafe',
+          text: '背面有一圈磁鐵，充電器和配件會自己吸到正確的位置。MagSafe 充電最高約 15 瓦（iPhone 12 mini 為 12 瓦）；真正負責充電的仍是無線充電線圈，磁鐵只是幫忙對位。' },
+        screen: { title: 'Ceramic Shield 與 Super Retina XDR',
+          text: '正面是 Apple 這一代新推出的 Ceramic Shield 面板，下面是 6.1 吋的 Super Retina XDR 螢幕。' }
+      }
+    },
     'iphone4': {
       module: 'iphone4-2010',
       title: '2010・客廳裡的視訊電話',
@@ -999,7 +1052,9 @@ window.MUSEUM = {
     { name: 'Wikipedia — MicroTAC', url: 'https://en.wikipedia.org/wiki/MicroTAC' },
     { name: 'Wikipedia — HTC Dream', url: 'https://en.wikipedia.org/wiki/HTC_Dream' },
     { name: 'Android Developers Blog — Android Market now available for users', url: 'https://android-developers.googleblog.com/2008/10/android-market-now-available-for-users.html' },
-    { name: 'Apple 新聞稿 — Apple Presents iPhone 4（2010）', url: 'https://www.apple.com/newsroom/2010/06/07Apple-Presents-iPhone-4/' }
+    { name: 'Apple 新聞稿 — Apple Presents iPhone 4（2010）', url: 'https://www.apple.com/newsroom/2010/06/07Apple-Presents-iPhone-4/' },
+    { name: 'Apple 新聞稿 — Apple announces iPhone 12 and iPhone 12 mini（2020）', url: 'https://www.apple.com/newsroom/2020/10/apple-announces-iphone-12-and-iphone-12-mini-a-new-era-for-iphone-with-5g' },
+    { name: 'Apple — iPhone 12 技術規格', url: 'https://www.apple.com/eg/iphone-12/specs/' }
   ]
 };
 
@@ -1013,6 +1068,6 @@ window.MUSEUM.routes = [
     steps: ['startac', 'nokia-3310', 'iphone', 'galaxy-note'] },
   { id: 'origin', title: '起點篇', desc: '從背在背上的無線電，到第一通手持電話，再到能放進口袋的手機，看行動通訊怎麼起步。',
     steps: ['scr-300', 'dynatac-proto', 'dynatac-8000x', 'microtac'] },
-  { id: 'smart', title: '智慧型手機誕生篇', desc: '簡訊、觸控、App、視訊：看手機怎麼一步步長出智慧型手機的樣子。',
-    steps: ['orbitel-901', 'ibm-simon', 'iphone', 'htc-dream', 'iphone4'] }
+  { id: 'smart', title: '智慧型手機誕生篇', desc: '簡訊、觸控、App、視訊、5G：看手機怎麼一步步長出智慧型手機的樣子。',
+    steps: ['orbitel-901', 'ibm-simon', 'iphone', 'htc-dream', 'iphone4', 'iphone12'] }
 ];

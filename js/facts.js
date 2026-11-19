@@ -959,6 +959,73 @@ window.FACTS = [
   "status": "todo",
   "note": "沒有找到可靠的外型描述。3D 展廳只用通用的「早期大型手機」造型；1992 場景畫成「放在桌上的厚重主機」，主管要走近、彎下腰才看得到螢幕。外型與擺放位置都是示意，場景說明中已註明。",
   "src": []
+ },
+ {
+  "item": "iPhone 12",
+  "claim": "2020 年 10 月 13 日發表；iPhone 12 與 12 mini 主打 5G",
+  "status": "ok",
+  "note": "2020 年 10 月 13 日是 Apple 新聞稿的日期。開賣日各來源沒有查到一致的說法，場景與解說都不寫開賣日。",
+  "src": [
+   [
+    "Apple 新聞稿（2020）",
+    "https://www.apple.com/newsroom/2020/10/apple-announces-iphone-12-and-iphone-12-mini-a-new-era-for-iphone-with-5g"
+   ],
+   [
+    "iMore",
+    "https://www.imore.com/all-major-announcements-apples-iphone-12-event"
+   ]
+  ]
+ },
+ {
+  "item": "iPhone 12",
+  "claim": "iPhone 12 系列的四款機型全部支援 5G",
+  "status": "ok",
+  "note": "另有說法指出，5G 的實際速度要看電信業者與所在地的網路，解說因此只寫「更快」，沒有寫數字。",
+  "src": [
+   [
+    "Designboom",
+    "https://www.designboom.com/?p=734369"
+   ],
+   [
+    "Apple 新聞稿（2020）",
+    "https://www.apple.com/newsroom/2020/10/apple-announces-iphone-12-and-iphone-12-mini-a-new-era-for-iphone-with-5g"
+   ]
+  ]
+ },
+ {
+  "item": "iPhone 12",
+  "claim": "MagSafe：背面一圈磁鐵讓充電器與配件自己對位；MagSafe 充電最高約 15 瓦（12 mini 為 12 瓦）",
+  "status": "ok",
+  "note": "充電仍是靠無線充電線圈，磁鐵負責對位。Apple 也建議先把 MagSafe 充電器接上電，再把手機放上去。",
+  "src": [
+   [
+    "MacRumors",
+    "https://www.macrumors.com/2020/11/03/magsafe-limited-to-12w-for-iphone-12-mini/"
+   ],
+   [
+    "AppleInsider",
+    "https://appleinsider.com/articles/20/10/14/what-magsafe-on-the-iphone-12-is-how-it-works-and-what-can-it-do/amp/"
+   ]
+  ]
+ },
+ {
+  "item": "iPhone 12",
+  "claim": "6.1 吋 Super Retina XDR 螢幕、A14 仿生晶片、正面是 Ceramic Shield",
+  "status": "ok",
+  "note": "Apple 的規格頁列出 Ceramic Shield 前面板。「抗摔性提高 4 倍」這個數字沒有找到出處，不寫。",
+  "src": [
+   [
+    "Apple：iPhone 12 技術規格",
+    "https://www.apple.com/eg/iphone-12/specs/"
+   ]
+  ]
+ },
+ {
+  "item": "iPhone 12",
+  "claim": "2020 年很多人因疫情待在家裡，用視訊跟家人見面（場景的背景說明）",
+  "status": "todo",
+  "note": "屬於一般的歷史背景，本次沒有另外找出處。場景只用一句帶過，沒有寫任何數字。",
+  "src": []
  }
 ];
 (function () {
