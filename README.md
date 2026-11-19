@@ -47,7 +47,7 @@ js/
 ## 內容注意事項
 
 - 場景是「情境重現」：時間、地點、人物身分依史料，街上的人與情節是虛構的，頁面上有標示。
-- 沒有照片的展品（SCR-300、Orbitel 901）都已在展品頁註明：SCR-300 在展廳有專用的示意造型（`js/phones3d.js` 的 `radio`、`simon`），Orbitel 901 仍是通用造型。
+- 沒有照片的展品（Orbitel 901）都已在展品頁註明：SCR-300 與 Simon 在展廳有專用的示意造型（`js/phones3d.js` 的 `radio`、`simon`），Orbitel 901 仍是通用造型；Orbitel 901 唯一找到的照片在 Mobile Phone Museum，未見開放授權，所以沒有使用。
 - 新增或修改說法時，請同步更新 `js/facts.js`，狀態分 `ok`（已核對）、`diff`（來源不一）、`todo`（待查證）。
 
 ## 已知待辦

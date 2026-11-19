@@ -81,7 +81,7 @@ window.MUSEUM = {
   phones: [
     {
       id: 'scr-300', era: '1940s', year: 1942, name: 'SCR-300 背負式無線對講機',
-      shape: 'radio', color: '#4a5a3a', exhibit: true, imgNote: '此展品目前沒有照片。3D 模型是依背負式電台的外型示意，細節已簡化。',
+      img: 'images/scr-300.webp', credit: 'Daderot／CC0／https://commons.wikimedia.org/wiki/File:SCR-300_battery-powered_FM_voice_receiver_transmitter,_Motorola,_1940_-_National_Electronics_Museum_-_DSC00176.JPG', imgNote: '照片為美國國家電子博物館收藏的 SCR-300 收發機本體（BC-1000-A）。3D 模型是依背負式電台的外型示意，細節已簡化。', shape: 'radio', color: '#4a5a3a', exhibit: true,
       feature: '美軍二戰期間使用的無線對講機，士兵不必拉電線，就能在移動中通話',
       look: '大型機器，背在背上，拉出一根長天線，搭配一支手持話筒'
     },
