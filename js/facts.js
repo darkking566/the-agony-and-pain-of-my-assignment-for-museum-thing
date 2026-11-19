@@ -1026,6 +1026,41 @@ window.FACTS = [
   "status": "todo",
   "note": "屬於一般的歷史背景，本次沒有另外找出處。場景只用一句帶過，沒有寫任何數字。",
   "src": []
+ },
+ {
+  "item": "圖片授權",
+  "claim": "原本沒有授權標示的 7 張圖中，5 張已換成維基共享資源上有明確授權的圖片（Nokia 3310、MicroTAC、StarTAC、第一代 iPhone、Galaxy Note）",
+  "status": "ok",
+  "note": "每張都在「議題與來源」頁的圖片授權列出作者、授權與來源頁。舊圖已從 repo 的檔案中移除（但仍留在 git 歷史紀錄裡）。第一代 iPhone 與 Galaxy Note 是示意圖，不是實物照片。",
+  "src": [
+   [
+    "Nokia-3310.png",
+    "https://commons.wikimedia.org/wiki/File:Nokia-3310.png"
+   ],
+   [
+    "Motorola MicroTAC 9800x.jpg",
+    "https://commons.wikimedia.org/wiki/File:Motorola_MicroTAC_9800x.jpg"
+   ],
+   [
+    "First Generation Motorola StarTAC cellular phone.jpg",
+    "https://commons.wikimedia.org/wiki/File:First_Generation_Motorola_StarTAC_cellular_phone.jpg"
+   ],
+   [
+    "IPhone 1st Gen.svg",
+    "https://commons.wikimedia.org/wiki/File:IPhone_1st_Gen.svg"
+   ],
+   [
+    "Samsung Galaxy Note.png",
+    "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_Note.png"
+   ]
+  ]
+ },
+ {
+  "item": "圖片授權",
+  "claim": "Nokia-Mobira Senator 與 Samsung SC-1000 的照片",
+  "status": "todo",
+  "note": "維基共享資源與維基百科都找不到這兩個型號的可用照片，所以目前仍用原本的圖，來源與授權不明。SC-1000 那張是同時期的 SH-100S，不是 SC-1000 本身。需要換成有授權的圖，或自行拍攝／取得授權。",
+  "src": []
  }
 ];
 (function () {

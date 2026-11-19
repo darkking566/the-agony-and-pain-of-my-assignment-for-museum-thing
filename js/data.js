@@ -111,7 +111,7 @@ window.MUSEUM = {
     },
     {
       id: 'microtac', era: '1980s', year: 1989, name: 'Motorola MicroTAC',
-      img: 'images/microtac.png', shape: 'flip', color: '#2a2c30',
+      img: 'images/microtac.jpg', credit: 'Ross Padluck（Redrum0486）／公有領域／https://commons.wikimedia.org/wiki/File:Motorola_MicroTAC_9800x.jpg', shape: 'flip', color: '#2a2c30',
       feature: '第一支半掀蓋式行動電話', exhibit: true,
       look: '體積縮小，話筒蓋做在按鍵上方的摺疊設計，讓麥克風更靠近嘴巴'
     },
@@ -129,7 +129,7 @@ window.MUSEUM = {
     },
     {
       id: 'startac', era: '1990s', year: 1996, name: 'Motorola StarTAC',
-      img: 'images/startac.png', shape: 'clam', color: '#1f2226',
+      img: 'images/startac.jpg', credit: 'Nkp911m500／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:First_Generation_Motorola_StarTAC_cellular_phone.jpg', shape: 'clam', color: '#1f2226',
       feature: '最早普及的貝殼式摺疊手機，可以放進口袋', exhibit: true,
       look: '重量輕，機身頂部有一根可自由拉出的伸縮天線，有來電震動功能'
     },
@@ -147,7 +147,7 @@ window.MUSEUM = {
     },
     {
       id: 'nokia-3310', era: '2000s', year: 2000, name: 'Nokia 3310',
-      img: 'images/nokia-3310.png', shape: 'candybar', color: '#2c3e63', exhibit: true,
+      img: 'images/nokia-3310.jpg', credit: 'Foxbeefly／CC BY-SA 4.0／https://commons.wikimedia.org/wiki/File:Nokia-3310.png', shape: 'candybar', color: '#2c3e63', exhibit: true,
       feature: '直立式手機，以極佳的耐摔程度與超長續航力聞名',
       look: '超強續航、內建貪吃蛇遊戲，內部結構紮實，以耐用聞名'
     },
@@ -159,7 +159,7 @@ window.MUSEUM = {
     },
     {
       id: 'iphone', era: '2000s', year: 2007, name: 'iPhone（第一代）',
-      img: 'images/iphone.png', shape: 'touch', color: '#c9cbce', exhibit: true,
+      img: 'images/iphone.png', credit: 'Rafael Fernandez／CC BY-SA 4.0／https://commons.wikimedia.org/wiki/File:IPhone_1st_Gen.svg', imgNote: '圖為向量繪製的第一代 iPhone 示意圖。', shape: 'touch', color: '#c9cbce', exhibit: true,
       feature: '全觸控螢幕、社群媒體時代的起點，改變了現代智慧型手機的面貌',
       look: '正面只有一顆實體 Home 鍵；第一部把音樂播放器、行動電話與瀏覽器（Safari）集於一身的手機'
     },
@@ -177,7 +177,7 @@ window.MUSEUM = {
     },
     {
       id: 'galaxy-note', era: '2010s', year: 2011, name: 'Samsung Galaxy Note',
-      img: 'images/galaxy-note.png', shape: 'phablet', color: '#1d1f24', exhibit: true,
+      img: 'images/galaxy-note.png', credit: 'GadgetsGuy／CC BY 3.0／https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_Note.png', imgNote: '圖為手機正面的示意圖。', shape: 'phablet', color: '#1d1f24', exhibit: true,
       feature: '開創了智慧型手機的大螢幕與手寫筆風潮',
       look: '配備 S Pen 電磁式觸控筆，可以直接在超大螢幕上書寫與繪畫'
     },
