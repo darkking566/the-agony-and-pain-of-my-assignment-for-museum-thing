@@ -141,18 +141,6 @@ export class Person {
       const palm = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), mat(skin));
       palm.castShadow = true;
       hand.add(palm);
-      // 手指：四指併攏、微彎，拇指在內側
-      const fm = mat(skin);
-      [[-0.024, 0.052], [-0.008, 0.06], [0.008, 0.058], [0.024, 0.046]].forEach(([fx, len]) => {
-        const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.0085, len, 3, 6), fm);
-        f.position.set(fx, -0.06 - len * 0.3, 0.03);
-        f.rotation.x = -0.5;
-        hand.add(f);
-      });
-      const th = new THREE.Mesh(new THREE.CapsuleGeometry(0.0095, 0.03, 3, 6), fm);
-      th.position.set(-side * 0.045, -0.03, 0.04);
-      th.rotation.set(-0.7, 0, -side * 0.7);
-      hand.add(th);
       // 手上的掛點：拿東西時用
       const grip = new THREE.Object3D();
       grip.position.set(0, -0.03, 0.03);
