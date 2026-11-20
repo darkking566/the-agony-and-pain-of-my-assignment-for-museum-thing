@@ -1,0 +1,448 @@
+/* 換頁轉場：離場時光圈從點擊處擴張，進場時幕簾向上升起、內容依序浮現。
+   所有動畫都只在 js/transitions.js 加上 class 之後才會生效，沒有 JS 時頁面照常顯示。 */
+:root {
+  --mx-ease: cubic-bezier(.2, .8, .2, 1);
+  --mx-ease-io: cubic-bezier(.76, 0, .24, 1);
+}
+
+/* 幕簾：離場和進場共用同一張，文字位置完全一致，換頁時看起來像同一塊畫面 */
+.mx-curtain {
+  position: fixed; inset: 0; z-index: 2147483000;
+  display: grid; place-items: center;
+  background: #000; color: #f5f5f7;
+  pointer-events: all; will-change: clip-path, opacity;
+}
+.mx-curtain[data-tone="blue"] { color: #fff; }
+.mx-label { text-align: center; padding: 0 24px; max-width: 90vw; }
+.mx-eyebrow { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 600; letter-spacing: .18em; opacity: .72; }
+.mx-title {
+  display: block; font-weight: 600; font-size: clamp(34px, 8vw, 76px); line-height: 1.1; letter-spacing: .02em;
+  text-wrap: balance;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 新頁面載入到 JS 接手之前先蓋住，避免閃一下白畫面 */
+html.mx-cover::after {
+  content: ""; position: fixed; inset: 0; z-index: 2147483000; background: var(--mx-c, #000);
+}
+
+/* 進場：開場區塊裡的東西依序浮起 */
+@keyframes mx-rise {
+  from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+@keyframes mx-fade { from { opacity: 0; } to { opacity: 1; } }
+
+html.mx-enter :is(.hero, .page-head, .phone-hero) > .wrap > * {
+  animation: mx-rise .9s var(--mx-ease) both;
+  animation-delay: calc(var(--mx-d, 0ms) + var(--i, 0) * 85ms);
+}
+:is(.hero, .page-head, .phone-hero) > .wrap > :nth-child(2) { --i: 1; }
+:is(.hero, .page-head, .phone-hero) > .wrap > :nth-child(3) { --i: 2; }
+:is(.hero, .page-head, .phone-hero) > .wrap > :nth-child(4) { --i: 3; }
+:is(.hero, .page-head, .phone-hero) > .wrap > :nth-child(5) { --i: 4; }
+/* 幕簾還沒升起時，先讓動畫停在第一格 */
+html.mx-hold :is(.hero, .page-head, .phone-hero) > .wrap > *, html.mx-hold .hero-strip { animation-play-state: paused !important; }
+/* 展品照片由 JS 負責飛過去，不要跟著一起浮起來 */
+html.mx-fly .phone-hero > .wrap > .photo { animation: none !important; }
+
+/* 展覽頁：平面 / 3D 切換時淡入 */
+#panel-2d:not([hidden]), #panel-3d:not([hidden]) { animation: mx-fade .5s ease both; }
+
+/* 心理測驗：換題、出結果時整張卡片重新浮起 */
+.quiz-card > * { animation: mx-rise .55s var(--mx-ease) both; }
+.quiz-card > :nth-child(2) { animation-delay: 45ms; }
+.quiz-card > :nth-child(3) { animation-delay: 90ms; }
+.quiz-card > :nth-child(4) { animation-delay: 150ms; }
+.quiz-result > * { animation: mx-rise .6s var(--mx-ease) both; }
+.quiz-result > :nth-child(2) { animation-delay: 60ms; }
+.quiz-result > :nth-child(3) { animation-delay: 120ms; }
+.quiz-result > :nth-child(4) { animation-delay: 180ms; }
+.quiz-result > :nth-child(5) { animation-delay: 240ms; }
+.quiz-result > :nth-child(6) { animation-delay: 300ms; }
+
+/* 小互動：卡片浮起、照片微放大、按鈕按下去有回饋 */
+.pick, .door, .era-tile { transition: transform .4s var(--mx-ease), background-color .2s; }
+.pick:hover, .door:hover, .era-tile:hover { transform: translateY(-5px); }
+.pick .photo img { transition: transform .7s var(--mx-ease); }
+.pick:hover .photo img { transform: scale(1.07); }
+.door .go { transition: transform .3s var(--mx-ease); }
+.door:hover .go { transform: translateX(5px); }
+.btn { transition: background-color .2s, transform .2s var(--mx-ease), box-shadow .3s; }
+.btn:active { transform: scale(.96); }
+.btn.primary:hover { box-shadow: 0 8px 30px rgba(0, 113, 227, .45); }
+.nav-links a { transition: color .2s; }
+
+
+/* ---------- 展覽頁：換年代有方向感 ---------- */
+#panel-2d { overflow-x: clip; }
+.era-panel { animation: era-in .55s var(--mx-ease) both; }
+@keyframes era-in {
+  from { opacity: 0; transform: translateX(calc(var(--dir, 0) * 56px)); }
+  to   { opacity: 1; transform: none; }
+}
+/* 年代裡的手機卡片依序「彈」出來 */
+.phone-row .flip { animation: mx-pop .6s var(--mx-ease) both; }
+.phone-row .flip:nth-child(2) { animation-delay: 70ms; }
+.phone-row .flip:nth-child(3) { animation-delay: 140ms; }
+.phone-row .flip:nth-child(4) { animation-delay: 210ms; }
+.phone-row .flip:nth-child(n+5) { animation-delay: 280ms; }
+@keyframes mx-pop { from { opacity: 0; transform: scale(.92) translateX(calc(var(--dir, 0) * 24px)); } to { opacity: 1; transform: none; } }
+.phone-row { position: relative; }
+
+/* 年代列：藍色選取塊滑過去 */
+.era-rail { position: relative; }
+.era-rail .era-dot { position: relative; z-index: 1; transition: color .3s; }
+.era-rail .era-dot[aria-selected="true"] { background: transparent; color: #fff; }
+.era-ind {
+  position: absolute; left: 0; top: 0; z-index: 0; border-radius: 980px; background: var(--blue);
+  opacity: 0; pointer-events: none;
+  transition: transform .55s var(--mx-ease), width .55s var(--mx-ease), height .55s var(--mx-ease), opacity .2s;
+}
+.era-ind.on { opacity: 1; }
+
+/* 展覽卡片：容器加兩個真正的按鈕，取代「按鈕裡放連結」 */
+.flip { cursor: pointer; }
+.flip-front .tap, .back-flip { border: 0; background: none; padding: 0; font: inherit; cursor: pointer; text-align: left; }
+.flip-front .tap { align-self: flex-start; margin-top: 2px; font-size: 13px; color: var(--link); }
+.back-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 16px; }
+.back-actions .back-link { margin-top: 0; }
+.back-flip { font-size: 14px; color: inherit; opacity: .72; text-decoration: underline; text-underline-offset: 3px; }
+.back-flip:hover { opacity: 1; }
+.flip :is(.tap, .back-flip, .back-link):focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- 3D 展廳載入骨架 ---------- */
+.hall-skel { display: grid; justify-items: center; gap: 18px; }
+.hall-skel p { margin: 0; font-size: 14px; }
+.hs-phone {
+  width: 54px; height: 108px; border-radius: 14px; border: 2px solid rgba(159, 176, 200, .55);
+  background: linear-gradient(115deg, transparent 35%, rgba(159, 176, 200, .28) 50%, transparent 65%) 0 0 / 250% 100%;
+  animation: hs-float 2.4s ease-in-out infinite, hs-shine 1.8s linear infinite;
+}
+.hs-bar { position: relative; width: 140px; height: 3px; border-radius: 2px; overflow: hidden; background: rgba(159, 176, 200, .22); }
+.hs-bar i { position: absolute; inset: 0 auto 0 0; width: 40%; border-radius: 2px; background: #60a5fa; animation: hs-slide 1.3s var(--mx-ease-io) infinite; }
+@keyframes hs-float { 50% { transform: translateY(-8px) rotate(-3deg); } }
+@keyframes hs-shine { to { background-position: -150% 0; } }
+@keyframes hs-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* ---------- 首頁：展品橫幅 ---------- */
+.hero.has-strip > .wrap { padding-bottom: 44px; }
+.hero-strip {
+  position: relative; overflow: hidden; padding: 6px 0 84px; text-align: left;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+html.mx-enter .hero-strip { animation: mx-rise 1s var(--mx-ease) both; animation-delay: calc(var(--mx-d, 0ms) + 420ms); }
+.hero-track { display: flex; gap: 18px; width: max-content; padding-right: 18px; animation: mx-marquee 90s linear infinite; }
+.hero-strip:hover .hero-track, .hero-strip:focus-within .hero-track { animation-play-state: paused; }
+@keyframes mx-marquee { to { transform: translateX(-50%); } }
+.strip-item { flex: 0 0 136px; display: flex; flex-direction: column; gap: 2px; color: #f5f5f7; min-width: 0; }
+.strip-item:hover { text-decoration: none; }
+.strip-item .photo { margin-bottom: 8px; border-radius: 10px; transition: transform .45s var(--mx-ease), box-shadow .45s; }
+.strip-item:hover .photo, .strip-item:focus-visible .photo { transform: translateY(-8px) scale(1.04); box-shadow: 0 18px 40px rgba(0, 113, 227, .35); }
+.strip-item .y { color: #a1a1a6; font-size: 13px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.strip-item .n { font-size: 14px; font-weight: 600; line-height: 1.3; }
+
+/* ---------- 往下捲時浮現 ---------- */
+.mx-pre { opacity: .3; transform: translateY(32px); }
+.mx-in { animation: mx-reveal .85s var(--mx-ease) backwards; animation-delay: var(--rd, 0ms); }
+@keyframes mx-reveal { from { opacity: .3; transform: translateY(32px); } }
+
+/* ---------- 窄螢幕導覽列 ---------- */
+.nav-links { position: relative; }
+@media (max-width: 720px) {
+  .nav-links.has-more {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+  }
+  .strip-item { flex-basis: 112px; }
+  .hero-strip { padding-bottom: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.mx-cover::after { display: none; }
+  .mx-curtain { display: none; }
+  .hero-strip { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .strip-dup { display: none; }
+  .mx-pre { opacity: 1; transform: none; }
+}
+
+
+/* =====================================================================
+   質感與動畫第二批（搭配 js/polish.js）
+   ===================================================================== */
+
+/* ---------- 開場：緩慢漂移的光暈，滑鼠移動時輕微視差 ---------- */
+.hero, .page-head.dark { position: relative; overflow: hidden; isolation: isolate; }
+.hero > .wrap, .page-head.dark > .wrap { position: relative; z-index: 1; }
+.hero::before, .hero::after, .page-head.dark::before, .page-head.dark::after {
+  content: ""; position: absolute; z-index: 0; pointer-events: none; border-radius: 50%;
+  width: min(78vw, 920px); aspect-ratio: 1; will-change: transform;
+  translate: calc(var(--px, 0) * 38px) calc(var(--py, 0) * 26px);
+  transition: translate .8s var(--mx-ease);
+}
+.hero::before, .page-head.dark::before {
+  left: -16%; top: -46%;
+  background: radial-gradient(closest-side, rgba(41, 151, 255, .30), rgba(41, 151, 255, 0) 72%);
+  animation: aura-a 19s ease-in-out infinite alternate;
+}
+.hero::after, .page-head.dark::after {
+  right: -20%; bottom: -52%;
+  background: radial-gradient(closest-side, rgba(100, 210, 255, .17), rgba(100, 210, 255, 0) 72%);
+  animation: aura-b 23s ease-in-out infinite alternate;
+  translate: calc(var(--px, 0) * -52px) calc(var(--py, 0) * -34px);
+}
+@keyframes aura-a { to { transform: translate3d(14%, 10%, 0) scale(1.14); } }
+@keyframes aura-b { to { transform: translate3d(-12%, -9%, 0) scale(1.1); } }
+
+/* 橫幅裡的手機照片：游標在上面時依位置微微傾斜 */
+.strip-item:hover .photo, .strip-item:focus-visible .photo {
+  transform: translateY(-8px) scale(1.04) perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+.strip-item .photo.tilting { transition: transform .12s linear, box-shadow .45s; }
+
+/* ---------- 卡片：跟著游標的光（只在有游標的裝置上） ---------- */
+.pick, .door, .era-tile, .route { position: relative; }
+@media (hover: hover) and (pointer: fine) {
+  :is(.door, .era-tile, .pick, .route, .flip-front)::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(260px circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--link) 17%, transparent), transparent 70%);
+    transition: opacity .35s;
+  }
+  :is(.door, .era-tile, .pick, .route, .flip-front):hover::after { opacity: 1; }
+}
+
+/* ---------- 導覽列：捲動進度 ---------- */
+.nav-progress {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, #2997ff, #64d2ff); transform-origin: 0 50%; transform: scaleX(0);
+}
+
+/* ---------- 按鈕：主要按鈕 hover 時掃過一道光 ---------- */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn.primary::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .38) 50%, transparent 65%);
+  transform: translateX(-130%);
+}
+@media (hover: hover) {
+  .btn.primary:not([disabled]):hover::after { transform: translateX(130%); transition: transform .75s var(--mx-ease); }
+}
+
+/* ---------- 往下捲浮現：依內容用不同的方向 ---------- */
+@keyframes mx-reveal-scale { from { opacity: .3; transform: translateY(22px) scale(.93); } }
+@keyframes mx-reveal-blur  { from { opacity: .3; transform: translateY(18px); filter: blur(6px); } }
+@keyframes mx-reveal-l     { from { opacity: .3; transform: translateX(-30px); } }
+@keyframes mx-reveal-r     { from { opacity: .3; transform: translateX(30px); } }
+.door-grid > .mx-in, .pick-grid > .mx-in, .people-grid > .mx-in { animation-name: mx-reveal-scale; }
+.stats > .mx-in { animation-name: mx-reveal-blur; }
+.era-tiles > .mx-in:nth-child(odd) { animation-name: mx-reveal-l; }
+.era-tiles > .mx-in:nth-child(even) { animation-name: mx-reveal-r; }
+
+/* ---------- 參觀護照：蓋章 ---------- */
+.stamp .seal { position: relative; }
+.stamp.stamp-new { animation: stamp-thud .45s .34s cubic-bezier(.3, 1.6, .5, 1) both; }
+.stamp .seal.seal-new { animation: seal-slam .78s cubic-bezier(.2, .9, .3, 1.15) both; }
+.stamp .seal.seal-new::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--blue); animation: seal-ring .9s .3s ease-out both;
+}
+@keyframes seal-slam {
+  0%   { transform: scale(3.2) rotate(-34deg); opacity: 0; }
+  46%  { transform: scale(.84) rotate(-6deg); opacity: 1; }
+  68%  { transform: scale(1.07) rotate(-10deg); }
+  100% { transform: scale(1) rotate(-9deg); opacity: 1; }
+}
+@keyframes seal-ring { from { transform: scale(1); opacity: .8; } to { transform: scale(2.4); opacity: 0; } }
+@keyframes stamp-thud { 0% { transform: translateY(0); } 30% { transform: translateY(5px) scale(.985); } 100% { transform: none; } }
+.mx-confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 60; pointer-events: none; }
+
+/* ---------- 展覽頁：時間軸 ---------- */
+.era-rail { padding-bottom: 22px; }
+.era-track { position: absolute; left: 0; bottom: 7px; height: 2px; pointer-events: none; z-index: 0; }
+.era-track .base, .era-track .fill { position: absolute; top: 0; height: 2px; border-radius: 1px; }
+.era-track .base { background: var(--line); }
+.era-track .fill { background: var(--blue); transition: width .6s var(--mx-ease); }
+.era-track .tick {
+  position: absolute; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--line);
+  transition: background-color .3s, border-color .3s, transform .45s var(--mx-ease);
+}
+.era-track .tick.on { background: var(--blue); border-color: var(--blue); }
+.era-track .tick.cur { transform: scale(1.5); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 22%, transparent); }
+/* 換年代時，大事紀一條一條浮上來 */
+.era-panel .events li { animation: mx-rise .6s var(--mx-ease) both; animation-delay: calc(140ms + var(--i, 0) * 70ms); }
+.era-panel .events li:nth-child(2) { --i: 1; } .era-panel .events li:nth-child(3) { --i: 2; }
+.era-panel .events li:nth-child(4) { --i: 3; } .era-panel .events li:nth-child(5) { --i: 4; }
+.era-panel .events li:nth-child(6) { --i: 5; } .era-panel .events li:nth-child(n+7) { --i: 6; }
+
+/* ---------- 心理測驗 ---------- */
+.quiz-option { transition: transform .2s var(--mx-ease), background-color .2s, border-color .2s, opacity .25s; }
+.quiz-option:active { transform: scale(.98); }
+.quiz-option b { transition: background-color .2s, color .2s, transform .35s var(--mx-ease); }
+.quiz-option.picked { border-color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--bg)); transform: scale(.975); }
+.quiz-option.picked b { background: var(--blue); color: #fff; transform: scale(1.2) rotate(-8deg); }
+.quiz-options.locked .quiz-option:not(.picked) { opacity: .4; }
+.quiz-options.locked { pointer-events: none; }
+.quiz-progress span { transform-origin: 0 50%; }
+.quiz-progress span.now { animation: seg-fill .55s var(--mx-ease) both; }
+@keyframes seg-fill { from { transform: scaleX(0); } }
+.quiz-bars i::after { transform-origin: 0 50%; animation: bar-grow 1s calc(.3s + var(--bi, 0) * 90ms) var(--mx-ease) both; }
+.quiz-bars div:nth-child(2) { --bi: 1; } .quiz-bars div:nth-child(3) { --bi: 2; } .quiz-bars div:nth-child(4) { --bi: 3; }
+@keyframes bar-grow { from { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before, .hero::after, .page-head.dark::before, .page-head.dark::after { animation: none; transition: none; }
+  .stamp.stamp-new, .stamp .seal.seal-new, .stamp .seal.seal-new::after { animation: none; }
+  .era-panel .events li, .quiz-progress span.now, .quiz-bars i::after { animation: none; }
+  .btn.primary::after { display: none; }
+  .mx-confetti { display: none; }
+}
+
+
+/* =====================================================================
+   質感第三批：字體、年代色、照片展台、頁尾、載入
+   ===================================================================== */
+
+/* ---------- 標題改用明體，內文維持黑體：像展覽圖錄 ---------- */
+:root {
+  --display: 'Noto Serif TC', 'Songti TC', 'PMingLiU', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'PingFang TC', serif;
+}
+.mx-title { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+.hero h1 { font-weight: 900; letter-spacing: .04em; }
+.hero .tag { font-family: var(--sans); }
+.page-head h1, .phone-hero h1 { font-weight: 900; letter-spacing: .02em; }
+.h-section, .era-intro h3, .door h3, .pick-body h3, .flip-front .name, .flip-back h4 { font-weight: 700; }
+.stats b, .era-tile .y, .stamp b { font-family: var(--sans); font-weight: 700; }
+.eyebrow { letter-spacing: .12em; }
+
+/* ---------- 年代色：從褐色一路走到青色 ---------- */
+.era-tile { --era: var(--blue); }
+.era-tile::before {
+  content: ""; position: absolute; left: 20px; top: 0; width: 30px; height: 3px; border-radius: 0 0 3px 3px;
+  background: var(--era); transition: width .45s var(--mx-ease);
+}
+.era-tile:hover::before { width: calc(100% - 40px); }
+.era-tile .c { color: color-mix(in srgb, var(--era) 72%, var(--ink)); }
+.era-ind { background: var(--era, var(--blue)); transition: transform .55s var(--mx-ease), width .55s var(--mx-ease), height .55s var(--mx-ease), opacity .2s, background-color .5s; }
+.era-track .fill { background: linear-gradient(90deg, var(--from, var(--blue)), var(--to, var(--blue))); }
+.era-track .tick.on { background: var(--era, var(--blue)); border-color: var(--era, var(--blue)); }
+.era-track .tick.cur { box-shadow: 0 0 0 4px color-mix(in srgb, var(--era, var(--blue)) 24%, transparent); }
+.era-intro h3 { color: color-mix(in srgb, var(--era, var(--ink)) 80%, var(--ink)); transition: color .5s; }
+.era-intro .network { color: color-mix(in srgb, var(--era, var(--muted)) 55%, var(--muted)); }
+
+/* ---------- 照片展台：柔和的聚光，白底融進去 ---------- */
+.photo.real, .dark .photo.real, .pick .photo.real, .flip-front .photo.real {
+  background: radial-gradient(ellipse 85% 70% at 50% 38%, #ffffff 0%, #f1f2f5 62%, #e4e6eb 100%);
+}
+.photo.real img { mix-blend-mode: multiply; }
+.flip-front { transition: box-shadow .4s; }
+.flip:hover .flip-front { box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .35); }
+.flip-back {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--ink) 92%, var(--blue)), var(--ink) 70%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09);
+}
+.pick:active, .door:active, .era-tile:active { transform: translateY(-2px) scale(.985); }
+
+/* ---------- 圖片載入：先模糊淡入 ---------- */
+.photo img { transition: opacity .6s ease, filter .6s ease, transform .7s var(--mx-ease); }
+.photo img.ld { opacity: 0; filter: blur(10px); }
+.photo:has(img.ld) {
+  background-image: linear-gradient(110deg, transparent 30%, rgba(160, 170, 190, .22) 50%, transparent 70%);
+  background-size: 250% 100%; animation: hs-shine 1.6s linear infinite;
+}
+
+/* ---------- 頁尾：大字收尾 ---------- */
+.footer { position: relative; overflow: hidden; }
+.footer .wrap { position: relative; z-index: 1; }
+.foot-mark {
+  margin: 0 0 20px !important; font-family: var(--display); font-weight: 900; line-height: 1;
+  font-size: clamp(56px, 15vw, 150px); letter-spacing: .06em; white-space: nowrap; user-select: none;
+  color: color-mix(in srgb, var(--ink) 7%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 95%); mask-image: linear-gradient(180deg, #000 20%, transparent 95%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo img { transition: none; }
+  .photo:has(img.ld) { animation: none; }
+}
+
+
+/* =====================================================================
+   質感第四批：比較表手機版、展品頁年代色、人物與議題頁
+   ===================================================================== */
+
+/* ---------- 展品頁：跟著年代換色 ---------- */
+.phone-hero { position: relative; overflow: hidden; isolation: isolate; }
+.phone-hero > .wrap { position: relative; z-index: 1; }
+.phone-hero::before {
+  content: ""; position: absolute; z-index: 0; pointer-events: none; border-radius: 50%;
+  width: min(80vw, 900px); aspect-ratio: 1; left: -10%; top: -110px; will-change: transform;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--era, #2997ff) 46%, transparent), transparent 72%);
+  animation: aura-a 19s ease-in-out infinite alternate;
+}
+.phone-hero .eyebrow { color: color-mix(in srgb, var(--era, #a1a1a6) 45%, #f5f5f7); }
+.phone-hero .photo { box-shadow: 0 28px 70px -24px color-mix(in srgb, var(--era, #000) 70%, transparent); }
+.era-ctx h2 { color: color-mix(in srgb, var(--era, var(--ink)) 80%, var(--ink)); }
+.cmp-table thead th.now { box-shadow: inset 0 3px 0 var(--era, var(--blue)); }
+
+/* ---------- 前後比較表：手機上改成上下堆疊 ---------- */
+@media (max-width: 720px) {
+  .cmp-wrap { overflow: visible; }
+  .cmp-table { min-width: 0; table-layout: auto; }
+  .cmp-table, .cmp-table thead, .cmp-table tbody, .cmp-table tr, .cmp-table th, .cmp-table td { display: block; }
+  .cmp-table thead tr { display: grid; gap: 8px; margin-bottom: 18px; }
+  .cmp-table thead th:first-child { display: none; }
+  .cmp-table thead th { padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; }
+  .cmp-table thead th.now { background: color-mix(in srgb, var(--era, var(--blue)) 10%, var(--bg)); border-color: color-mix(in srgb, var(--era, var(--blue)) 45%, var(--line)); box-shadow: none; }
+  .cmp-table tbody tr { margin-bottom: 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .cmp-table tbody th { width: auto; padding: 10px 16px 8px; border-top: 0; background: var(--card); font-size: 13px; }
+  .cmp-table tbody td { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 10px; padding: 9px 16px; border-top: 0; }
+  .cmp-table tbody td::before { content: attr(data-c); color: var(--muted); font-size: 13px; }
+  .cmp-table tbody td.now { background: color-mix(in srgb, var(--era, var(--blue)) 8%, var(--bg)); font-weight: 500; }
+}
+
+/* ---------- 人物頁 ---------- */
+.person { --era: var(--blue); transition: transform .45s var(--mx-ease), box-shadow .45s; }
+.person:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -30px rgba(0, 0, 0, .35); }
+.person .era { color: color-mix(in srgb, var(--era) 70%, var(--ink)); font-weight: 600; letter-spacing: .06em; }
+.p-photo { overflow: hidden; border-radius: 12px; align-self: start; box-shadow: 0 18px 36px -18px color-mix(in srgb, var(--era) 65%, transparent); }
+.p-photo img { transition: transform .8s var(--mx-ease), filter .6s; }
+.person:hover .p-photo img { transform: scale(1.05); }
+.person .rel a { transition: opacity .2s; }
+.person .rel:hover a:not(:hover) { opacity: .55; }
+
+/* ---------- 議題與來源頁 ---------- */
+.card { position: relative; transition: transform .4s var(--mx-ease), background-color .2s; }
+.card:hover { transform: translateY(-4px); }
+.card .more { transition: transform .3s var(--mx-ease); align-self: flex-start; }
+.card:hover .more { transform: translateX(5px); }
+.source-list li { transition: padding-left .3s var(--mx-ease), background-color .3s; }
+.source-list li:hover { padding-left: 10px; background: color-mix(in srgb, var(--link) 5%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .card::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(260px circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--link) 17%, transparent), transparent 70%);
+    transition: opacity .35s;
+  }
+  .card:hover::after { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone-hero::before { animation: none; }
+  .person, .card, .source-list li, .p-photo img { transition: none; }
+  .person:hover, .card:hover, .person:hover .p-photo img { transform: none; }
+}
+
+/* ---------- 觸控裝置：點下去時不要套用「游標移上去」的效果 ----------
+   手機上點一下會讓該元素進入 :hover 並一直卡著，結果轉場開始前卡片會往上跳、
+   展品橫幅會突然停住、照片會放大，看起來像畫面閃一下。 */
+@media (hover: none) {
+  a, button { -webkit-tap-highlight-color: transparent; }
+  .pick:hover, .door:hover, .era-tile:hover, .card:hover, .person:hover { transform: none; }
+  .pick:hover .photo img, .person:hover .p-photo img { transform: none; }
+  .door:hover .go, .card:hover .more { transform: none; }
+  .hero-strip:hover .hero-track { animation-play-state: running; }
+  .strip-item:hover .photo { transform: none; box-shadow: none; }
+  .btn.primary:hover { box-shadow: none; }
+  .source-list li:hover { padding-left: 0; background: transparent; }
+}
