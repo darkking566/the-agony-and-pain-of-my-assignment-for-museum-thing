@@ -11,6 +11,7 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
   const envImport = import('three/addons/environments/RoomEnvironment.js').catch(() => null);
   const fxImport = import('./postfx.js').catch(() => null);
   const ptImport = import('./particles.js').catch(() => null);
+  const dtImport = import('./detail.js').catch(() => null);
   /* ---------- 介面 ---------- */
   const root = document.createElement('div');
   root.className = 'imm';
@@ -127,6 +128,10 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
       ms.forEach((m) => { if (m.isMeshStandardMaterial) m.envMapIntensity = ei; });
     });
   } catch (err) { console.warn('環境反光載入失敗', err); }
+  // 材質細節（斑駁、細小凹凸）：加 ?nodetail 可關掉比較
+  if (!/[?&]nodetail\b/.test(location.search)) {
+    try { const dm = await dtImport; if (dm) dm.applyDetail(scene, { coarse }); } catch (e) { console.warn('材質細節載入失敗', e); }
+  }
   // 環境粒子（灰塵、花粉、落葉）
   let particles = null;
   try { const pm = await ptImport; if (pm) particles = pm.createParticles(scene, script.module, base); } catch (e) { console.warn('粒子載入失敗', e); }

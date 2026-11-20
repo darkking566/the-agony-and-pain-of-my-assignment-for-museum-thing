@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { V, span, lerp, mat, box, cyl, sign, textTexture, Person, placeBetween, building } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
-import { facadeMaterial, plasterTex, asphaltTex, pavingTex, blobShadow, decal, cloudSky, leafTree, fallenLeaves, lampPost, bin, bollards, hydrantAndGrate, manhole, bench, bicycle, phoneBooth, postBox, shopInteriorTex, awning, parkedCar, sedanProfile, extrudeSide } from './props.js';
+import { facadeMaterial, facadeRelief, plasterTex, asphaltTex, pavingTex, blobShadow, decal, cloudSky, leafTree, fallenLeaves, lampPost, bin, bollards, hydrantAndGrate, manhole, bench, bicycle, phoneBooth, postBox, shopInteriorTex, awning, parkedCar, sedanProfile, extrudeSide } from './props.js';
 
 export function build({ scene, phone }) {
   /* ---------- 天空與光線：灰藍色的秋天午後 ---------- */
@@ -66,6 +66,7 @@ export function build({ scene, phone }) {
     const sideM = new THREE.MeshStandardMaterial({ map: plasterTex(palette[bn % palette.length], [d / 4, floors * 3.2 / 4]), roughness: 0.95 });
     body.material[0] = body.material[1] = sideM;
     scene.add(bld);
+    facadeRelief(scene, { x: bx, z: bz, w, d, floors, facing: 1, seed: bn });
     const fz = bz + d / 2;                           // 立面的 z
     // 櫥窗裡面：有貨架、有燈（貼在原本的黑玻璃前面）
     const win = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.84, 2.2), new THREE.MeshStandardMaterial({ map: interiorTex[bn % 3], emissive: '#ffffff', emissiveMap: interiorTex[bn % 3], emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.1 }));

@@ -2,6 +2,7 @@
 // 全部是靜態的，建好就不用更新；數量多的東西用 InstancedMesh 合併繪製。
 import * as THREE from 'three';
 import { V, mat, box, cyl, textTexture } from '../scene-kit.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 /* ---------- 程序貼圖 ---------- */
 // 固定亂數：每次進場景看到的路面都一樣
@@ -355,8 +356,55 @@ export function richBuilding(scene, building, { x, z, w, d = 10, floors, color, 
   for (let k = -2; k <= 2; k++) { const m = box(0.06, 2.3, 0.07, '#23201c'); m.position.set(x + k * (w * 0.84 / 4), 1.5, fz + facing * 0.075); m.castShadow = false; scene.add(m); }
   const sill = box(w * 0.88, 0.1, 0.18, '#4a4036'); sill.position.set(x, 0.35, fz + facing * 0.1); scene.add(sill);
   if (awn) { const a = awning(w * 0.84, ...AWN[seed % 4]); a.position.set(x, 2.95, fz + facing * 0.75); if (facing < 0) a.rotation.y = Math.PI; scene.add(a); }
-  const pipe = cyl(0.05, 0.05, h, '#4a4640', 8); pipe.position.set(x + w / 2 - 0.2, h / 2, fz + facing * 0.1); pipe.castShadow = false; scene.add(pipe);
+  const pipe = cyl(0.05, 0.05, h, '#4a4640', 8); pipe.position.set(x + w / 2 - 0.42, h / 2, fz + facing * 0.12); pipe.castShadow = false; scene.add(pipe);
+  facadeRelief(scene, { x, z, w, d, floors, facing, seed });
   return bld;
+}
+
+/* ---------- 立面的立體層次 ---------- */
+// 對齊 facadeTextures 的窗格（每層 4 格、每格 w/4 寬、窗洞在格子中間）：
+// 凸出的窗台與過樑、每層樓的飾帶、轉角壁柱、女兒牆與壓頂，偶爾屋頂上有水塔。
+// 同一棟的零件合併成一個 mesh（一次繪製）。
+export function facadeRelief(scene, { x, z, w, d = 10, floors, facing = 1, seed = 1, trim = '#d8d1c1' }) {
+  const geos = [], roofGeos = [];
+  const fz = z + facing * d / 2;
+  const add = (list, bw, bh, bd, px, py, pz) => { const g = new THREE.BoxGeometry(bw, bh, bd); g.translate(px, py, pz); list.push(g); };
+  const h = 3.6 + floors * 3.2;
+  const cw = w / 4, ww = cw * 176 / 320;
+  for (let k = 0; k < floors; k++) {
+    const top = 3.6 + 3.2 * (k + 1) - 3.2 * 90 / 512, sill = top - 3.2 * 290 / 512;
+    for (let c = 0; c < 4; c++) {
+      const cx = x - w / 2 + (c + 0.5) * cw;
+      add(geos, ww + 0.2, 0.07, 0.16, cx, sill - 0.02, fz + facing * 0.08);        // 窗台
+      add(geos, ww + 0.14, 0.13, 0.08, cx, top + 0.1, fz + facing * 0.04);         // 過樑
+      add(geos, 0.06, 0.035, 0.12, cx - ww / 2 - 0.04, sill - 0.07, fz + facing * 0.06); // 窗台托架
+      add(geos, 0.06, 0.035, 0.12, cx + ww / 2 + 0.04, sill - 0.07, fz + facing * 0.06);
+    }
+    add(geos, w + 0.04, 0.1, 0.07, x, 3.6 + 3.2 * k + 0.02, fz + facing * 0.035);  // 樓層飾帶
+  }
+  [-1, 1].forEach((sd) => add(geos, 0.32, h - 3.6, 0.1, x + sd * (w / 2 - 0.16), 3.6 + (h - 3.6) / 2, fz + facing * 0.05)); // 轉角壁柱
+  // 女兒牆（前面一道）與壓頂
+  add(geos, w + 0.3, 0.55, 0.22, x, h + 0.62, fz + facing * 0.04);
+  add(geos, w + 0.42, 0.08, 0.32, x, h + 0.93, fz + facing * 0.04);
+  // 屋頂水塔（大約三棟一個）
+  if (seed % 3 === 0) {
+    const tx = x + (seed % 2 ? 1 : -1) * w * 0.22, tz = z - facing * d * 0.1;
+    const tank = new THREE.CylinderGeometry(0.75, 0.75, 1.5, 14); tank.translate(tx, h + 2.0, tz); roofGeos.push(tank);
+    const cap = new THREE.ConeGeometry(0.82, 0.4, 14); cap.translate(tx, h + 2.95, tz); roofGeos.push(cap);
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => add(roofGeos, 0.08, 0.9, 0.08, tx + a * 0.5, h + 0.8, tz + b * 0.5));
+  }
+  const out = [];
+  const mk = (list, color, rough) => {
+    if (!list.length) return;
+    const g = mergeGeometries(list.map((q) => q.toNonIndexed()), false);
+    list.forEach((q) => q.dispose());
+    const m = new THREE.Mesh(g, mat(color, { roughness: rough }));
+    m.castShadow = true; m.receiveShadow = true;
+    scene.add(m); out.push(m);
+  };
+  mk(geos, trim, 0.85);
+  mk(roofGeos, '#6e6a63', 0.7);
+  return out;
 }
 const AWN = [['#9c2f2a', '#efe9da'], ['#2f5d4a', '#efe9da'], ['#c98a2b', '#efe9da'], ['#2f4a7a', '#efe9da']];
 
