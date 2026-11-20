@@ -23,7 +23,7 @@ export function build({ scene, phone }) {
   const RW = 9, RD = 8, RH = 3.2;
   richRoom(scene, { w: RW, d: RD, h: RH, floor: { kind: 'parquet', color: '#7a5434', size: 2, rough: 0.4 }, wall: { kind: 'plaster', color: '#e4d9c6', size: 3 }, wallBack: { kind: 'brick', color: '#9a5a44', size: 2 }, wallRight: { kind: 'brick', color: '#9a5a44', size: 2 }, ceil: { kind: 'ceil', color: '#e6dccb', size: 1.8 }, base: '#3b2a1c', crown: '#e6dccb' });
   // 左牆大窗：窗外是夏天的街
-  [-2.4, 1.2].forEach((z) => windowView(scene, { pos: V(-RW / 2 + 0.11, 1.7, z), yaw: Math.PI / 2, w: 2.8, h: 1.8, view: 'city', frame: '#3b2f27' }));
+  [-2.4, 1.2].forEach((z) => windowView(scene, { pos: V(-RW / 2 + 0.11, 1.7, z), yaw: Math.PI / 2, w: 2.8, h: 1.8, view: 'city', frame: '#3b2f27', curtain: '#b39a7c' }));
 
   // 吧台、咖啡機、菜單黑板
   const counter = box(5.2, 1.05, 0.7, '#5a3f2b'); counter.position.set(0.5, 0.525, -2.9);

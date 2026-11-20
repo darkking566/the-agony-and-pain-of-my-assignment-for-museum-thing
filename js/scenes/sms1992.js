@@ -36,7 +36,7 @@ export function build({ scene, phone }) {
     base: '#3b2a1c', crown: '#e6dccb'
   });
   // 左牆窗戶：窗外是冬天的街
-  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.6, -0.6), yaw: Math.PI / 2, w: 2.4, h: 1.6, view: 'city', frame: '#3b2f27' });
+  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.6, -0.6), yaw: Math.PI / 2, w: 2.4, h: 1.6, view: 'city', frame: '#3b2f27', blinds: 0.28 });
 
   /* ---------- 辦公桌與電腦 ---------- */
   const DESK_Z = -0.6;

@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
-import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights } from './props.js';
+import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -35,8 +35,7 @@ export function build({ scene, phone }) {
     base: '#3b2a1c', crown: '#e8e2d4'
   });
   // 左牆的大窗：窗外是傍晚的城市，窗邊有窗簾
-  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.65, 0.4), yaw: Math.PI / 2, w: 3.0, h: 1.9, view: 'city', frame: '#3b3a3f' });
-  [-1.7, 2.5].forEach((z) => { const cu = box(0.08, 2.5, 0.5, '#8a7f6e'); cu.position.set(-RW / 2 + 0.16, 1.6, z); scene.add(cu); });
+  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.65, 0.4), yaw: Math.PI / 2, w: 3.0, h: 1.9, view: 'city', frame: '#3b3a3f', curtain: '#8a7f6e' });
   ceilingLights(scene, [-2.5, 1.5, 3.5], [-1.0, 1.4], RH - 0.1, 0.9, 0.2, '#ffe6b8');
 
   /* ---------- 書桌（靠後牆）：筆電、檯燈、馬克杯 ---------- */
@@ -88,8 +87,7 @@ export function build({ scene, phone }) {
   for (let row = 0; row < 4; row++) for (let i = 0; i < 8; i++) {
     const bk = box(0.06, 0.26, 0.16, bookCols[(row * 3 + i) % bookCols.length]); bk.position.set(RW / 2 - 0.36, 0.3 + row * 0.5, -3.15 + i * 0.22); scene.add(bk);
   }
-  const door = box(0.08, 2.1, 0.95, '#8a6a46'); door.position.set(RW / 2 - 0.05, 1.05, 1.6); scene.add(door);
-  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), new THREE.MeshStandardMaterial({ color: '#c9ccd2', metalness: 0.8, roughness: 0.3 })); knob.position.set(RW / 2 - 0.12, 1.0, 1.28); scene.add(knob);
+  doorway(scene, { pos: V(RW / 2 - 0.1, 0, 1.6), yaw: -Math.PI / 2, w: 0.95, h: 2.1, color: '#8a6a46', handle: '#c9ccd2' });
   // 門邊的掛勾：掛著一個口罩和一串鑰匙（2020 年的日常）
   const hook = box(0.05, 0.05, 0.05, '#2a2a2e'); hook.position.set(RW / 2 - 0.1, 1.55, 0.6); scene.add(hook);
   const mask = box(0.02, 0.1, 0.17, '#bcd7ea'); mask.position.set(RW / 2 - 0.13, 1.47, 0.6); scene.add(mask);

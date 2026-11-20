@@ -5,7 +5,7 @@ import { nokiaInsets } from './insets.js';
 import * as THREE from 'three';
 import { V, span, lerp, mat, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
-import { richRoom, ceilingLights, windowView, leafyPlant, framedPicture, blobShadow, surfaceTex } from './props.js';
+import { richRoom, ceilingLights, windowView, leafyPlant, framedPicture, blobShadow, surfaceTex, doorway } from './props.js';
 
 export function build({ scene, phone }) {
   /* ---------- 光線與房間 ---------- */
@@ -29,7 +29,7 @@ export function build({ scene, phone }) {
 
   // 左牆的窗戶（陽光從這裡進來），窗外是操場旁的樹，掛著淺色窗簾
   [-2.6, 0.2, 3.0].forEach((z) => {
-    windowView(scene, { pos: V(-RW / 2 + 0.11, 1.85, z), yaw: Math.PI / 2, w: 2.0, h: 1.4, view: 'trees', frame: '#8c9399' });
+    windowView(scene, { pos: V(-RW / 2 + 0.11, 1.85, z), yaw: Math.PI / 2, w: 2.0, h: 1.4, view: 'trees', frame: '#8c9399', curtain: '#a9c4b0' });
     [-1, 1].forEach((sd) => { const cu = box(0.04, 1.55, 0.34, '#e9dfc4'); cu.position.set(-RW / 2 + 0.2, 1.85, z + sd * 1.0); cu.castShadow = false; scene.add(cu); });
   });
 
@@ -70,8 +70,7 @@ export function build({ scene, phone }) {
     note.rotation.x = ((i * 37) % 7 - 3) * 0.03;
     scene.add(note);
   });
-  const door = box(0.08, 2.2, 1.0, '#9a7b52'); door.position.set(RW / 2 - 0.12, 1.1, 1.9);
-  scene.add(door);
+  doorway(scene, { pos: V(RW / 2 - 0.1, 0, 1.9), yaw: -Math.PI / 2, w: 1.0, h: 2.2, color: '#9a7b52', frame: '#d8d4c6' });
 
   /* ---------- 桌椅 ---------- */
   const woodTop = '#c9a46a', metal = '#6d747a';

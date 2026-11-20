@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
-import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights } from './props.js';
+import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -31,7 +31,7 @@ export function build({ scene, phone }) {
     base: '#3b2a1c', crown: '#e6dccb'
   });
   // 左牆的窗：窗外是夜晚的城市
-  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.6, -0.6), yaw: Math.PI / 2, w: 2.6, h: 1.8, view: 'city', frame: '#3b2f27' });
+  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.6, -0.6), yaw: Math.PI / 2, w: 2.6, h: 1.8, view: 'city', frame: '#3b2f27', curtain: '#8a6a4a' });
   // 天花板的燈
   ceilingLights(scene, [-1.5, 1.5], [-1.0], RH - 0.1, 0.9, 0.2, '#ffe2a8');
 
@@ -105,10 +105,8 @@ export function build({ scene, phone }) {
   });
   const flowerTop = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), new THREE.MeshStandardMaterial({ color: '#f1c40f' }));
   flowerTop.position.set(1.9, 1.43, -RD / 2 + 0.6); scene.add(flowerTop);
-  // 窗簾（兩側）
-  [-RW / 2 + 0.25, -RW / 2 + 3.6].forEach((z) => {
-    const cur = box(0.08, 2.4, 0.5, '#8a6a4a'); cur.position.set(-RW / 2 + 0.15, 1.6, z - 0.1); scene.add(cur);
-  });
+  // 右牆的房門（書櫃和前牆之間）
+  doorway(scene, { pos: V(RW / 2 - 0.1, 0, 1.7), yaw: -Math.PI / 2, w: 0.9, h: 2.1, color: '#7a5a3e' });
 
   /* ---------- 人物 ---------- */
   const people = [];

@@ -591,19 +591,112 @@ export function richRoom(scene, { w = 9, d = 8, h = 3.2, floor = { kind: 'terraz
   parts.floor.position.set(0, -0.1, 0); parts.ceil.position.set(0, h + 0.1, 0);
   parts.back.position.set(0, h / 2, -d / 2); parts.front.position.set(0, h / 2, d / 2);
   parts.left.position.set(-w / 2, h / 2, 0); parts.right.position.set(w / 2, h / 2, 0);
-  // 踢腳板與頂線沿著四面牆
-  const bm = mat(base, { roughness: 0.6 }), cm = mat(crown, { roughness: 0.7 }), iw = w / 2 - 0.1, id = d / 2 - 0.1;
-  [[2 * iw, 0.03, 0, -id + 0.015, 0], [2 * iw, 0.03, 0, id - 0.015, 0]].forEach(([len, , px, pz]) => { const b = box(len, 0.14, 0.03, bm); b.position.set(px, 0.07, pz); b.castShadow = false; scene.add(b); const c = box(len, 0.1, 0.06, cm); c.position.set(px, h - 0.05, pz > 0 ? pz - 0.015 : pz + 0.015); c.castShadow = false; scene.add(c); });
-  [-iw + 0.015, iw - 0.015].forEach((px) => { const b = box(0.03, 0.14, 2 * id, bm); b.position.set(px, 0.07, 0); b.castShadow = false; scene.add(b); const c = box(0.06, 0.1, 2 * id, cm); c.position.set(px > 0 ? px - 0.015 : px + 0.015, h - 0.05, 0); c.castShadow = false; scene.add(c); });
+  // 踢腳板（板身＋上緣線腳）與頂線（三段階梯＋斜面）沿著四面牆
+  const bm = mat(base, { roughness: 0.55 }), cm = mat(crown, { roughness: 0.7 }), iw = w / 2 - 0.1, id = d / 2 - 0.1;
+  const trimGeos = { b: [], c: [] };
+  const run = (list, len, along, y, out, hh, dd, px, pz, rot = 0) => {
+    // along：'x' 或 'z'；out：往房間內凸出的方向（+1／-1）
+    const g = along === 'x' ? new THREE.BoxGeometry(len, hh, dd) : new THREE.BoxGeometry(dd, hh, len);
+    if (rot) { if (along === 'x') g.rotateX(rot * out); else g.rotateZ(-rot * out); }
+    if (along === 'x') g.translate(px, y, pz + out * dd / 2); else g.translate(px + out * dd / 2, y, pz);
+    list.push(g);
+  };
+  const walls = [['x', 2 * iw, 0, -id, 1], ['x', 2 * iw, 0, id, -1], ['z', 2 * id, -iw, 0, 1], ['z', 2 * id, iw, 0, -1]];
+  walls.forEach(([al, len, px, pz, o]) => {
+    run(trimGeos.b, len, al, 0.065, o, 0.13, 0.018, px, pz);                 // 板身
+    run(trimGeos.b, len, al, 0.138, o, 0.022, 0.026, px, pz);                // 上緣圓線
+    run(trimGeos.b, len, al, 0.006, o, 0.012, 0.024, px, pz);                // 踢腳
+    run(trimGeos.c, len, al, h - 0.03, o, 0.06, 0.03, px, pz);               // 頂線第一階
+    run(trimGeos.c, len, al, h - 0.075, o, 0.04, 0.018, px, pz);             // 第二階
+    run(trimGeos.c, len, al, h - 0.05, o, 0.07, 0.012, px + (al === 'z' ? o * 0.035 : 0), pz + (al === 'x' ? o * 0.035 : 0), 0.78); // 斜面
+  });
+  const mergeTrim = (list, m) => { const g = mergeGeometries(list.map((q) => q.toNonIndexed()), false); list.forEach((q) => q.dispose()); const me = new THREE.Mesh(g, m); me.receiveShadow = true; scene.add(me); };
+  mergeTrim(trimGeos.b, bm); mergeTrim(trimGeos.c, cm);
   return { ...parts, w, d, h };
 }
 /** 天花板上的日光燈（有框的發光面板） */
 export function ceilingLights(scene, xs, zs, y, w = 1.2, d = 0.3, warm = '#fffbe8') {
+  const tube = Math.min(w, d) < 0.25;                 // 細長的就做成日光燈管
+  const housing = mat('#e2e0da', { roughness: 0.45, metalness: 0.2 });
+  const rim = mat('#b9b7b0', { roughness: 0.4, metalness: 0.3 });
+  const glow = new THREE.MeshBasicMaterial({ color: warm });
+  const louver = mat('#f1f0ec', { roughness: 0.35, metalness: 0.25 });
   xs.forEach((x) => zs.forEach((z) => {
-    const fr = box(w + 0.1, 0.03, d + 0.1, '#d8d6cf'); fr.position.set(x, y + 0.012, z); fr.castShadow = false;
-    const l = new THREE.Mesh(new THREE.BoxGeometry(w, 0.02, d), new THREE.MeshBasicMaterial({ color: warm })); l.position.set(x, y - 0.005, z);
-    scene.add(fr, l);
+    const grp = new THREE.Group(); grp.position.set(x, y, z);
+    if (tube) {
+      const long = Math.max(w, d), alongX = w >= d;
+      const hb = box(alongX ? long + 0.06 : 0.16, 0.06, alongX ? 0.16 : long + 0.06, housing); hb.position.y = -0.02; hb.castShadow = false; grp.add(hb);
+      [-0.035, 0.035].forEach((o) => {
+        const t = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, long, 10), glow);
+        t.rotation[alongX ? 'z' : 'x'] = Math.PI / 2; t.position.set(alongX ? 0 : o, -0.07, alongX ? o : 0); grp.add(t);
+      });
+      [-1, 1].forEach((e) => { const c = box(alongX ? 0.03 : 0.12, 0.05, alongX ? 0.12 : 0.03, rim); c.position.set(alongX ? e * long / 2 : 0, -0.07, alongX ? 0 : e * long / 2); c.castShadow = false; grp.add(c); });
+    } else {
+      // 嵌燈：外框、內凹的發光面、格柵
+      const fr = box(w + 0.12, 0.03, d + 0.12, rim); fr.position.y = 0.0; fr.castShadow = false; grp.add(fr);
+      [-1, 1].forEach((e) => {
+        const a = box(w + 0.04, 0.05, 0.02, housing); a.position.set(0, -0.02, e * (d / 2 + 0.02)); a.castShadow = false; grp.add(a);
+        const b2 = box(0.02, 0.05, d + 0.04, housing); b2.position.set(e * (w / 2 + 0.02), -0.02, 0); b2.castShadow = false; grp.add(b2);
+      });
+      const l = new THREE.Mesh(new THREE.BoxGeometry(w, 0.01, d), glow); l.position.y = 0.002; grp.add(l);
+      const n = Math.max(2, Math.round(w / 0.3));
+      for (let i = 1; i < n; i++) { const c = box(0.012, 0.035, d, louver); c.position.set(-w / 2 + (i * w) / n, -0.02, 0); c.castShadow = false; grp.add(c); }
+      const c2 = box(w, 0.035, 0.012, louver); c2.position.y = -0.02; c2.castShadow = false; grp.add(c2);
+    }
+    scene.add(grp);
   }));
+}
+
+/** 吊燈：吊線＋燈罩（下方發光）。y：天花板高度，drop：往下吊多長 */
+export function pendantLamp(scene, x, y, z, { drop = 0.9, shade = '#2f3a3a', warm = '#ffd9a0', r = 0.22 } = {}) {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  const cup = cyl(0.05, 0.05, 0.03, '#2a2a2a', 10); cup.position.y = -0.015; cup.castShadow = false;
+  const cord = cyl(0.005, 0.005, drop, '#1c1c1c', 5); cord.position.y = -drop / 2; cord.castShadow = false;
+  const sh = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.25, r, r * 0.8, 20, 1, true), new THREE.MeshStandardMaterial({ color: shade, roughness: 0.5, metalness: 0.3, side: THREE.DoubleSide }));
+  sh.position.y = -drop - r * 0.4;
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(r * 0.28, 14, 10), new THREE.MeshBasicMaterial({ color: warm })); bulb.position.y = -drop - r * 0.62;
+  g.add(cup, cord, sh, bulb); scene.add(g); return g;
+}
+
+/** 窗簾：兩片落地布簾收在窗戶兩側，加窗簾桿。g 是 windowView 的群組（窗面 z=0，朝 +z） */
+function addCurtains(g, { w, h, floorY, color }) {
+  const top = h / 2 + 0.22, bottom = floorY + 0.03, ph = top - bottom, pw = Math.max(0.45, w * 0.3), zc = 0.32;
+  const m = new THREE.MeshStandardMaterial({ color, roughness: 0.95, side: THREE.DoubleSide });
+  [-1, 1].forEach((sd) => {
+    const geo = new THREE.PlaneGeometry(pw, ph, 28, 1);
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) { const u = p.getX(i) / pw + 0.5; p.setZ(i, Math.sin(u * Math.PI * 2 * 4.5) * 0.04 + Math.sin(u * Math.PI * 2 * 9 + 1) * 0.008); }
+    geo.computeVertexNormals();
+    const c = new THREE.Mesh(geo, m); c.position.set(sd * (w / 2 + 0.1 - pw / 2 + pw * 0.35), bottom + ph / 2, zc); c.receiveShadow = true;
+    g.add(c);
+  });
+  const rodM = mat('#3a3128', { roughness: 0.4, metalness: 0.4 });
+  const len = w + 0.9;
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, len, 8), rodM); rod.rotation.z = Math.PI / 2; rod.position.set(0, top + 0.03, zc); g.add(rod);
+  [-1, 1].forEach((sd) => {
+    const f = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), rodM); f.position.set(sd * len / 2, top + 0.03, zc); g.add(f);
+    const br = box(0.02, 0.02, zc, rodM); br.position.set(sd * (len / 2 - 0.12), top + 0.03, zc / 2); br.castShadow = false; g.add(br);
+  });
+}
+
+/** 門：門框飾條、凸起的門板、鉸鍊、把手。pos：牆面上、地板高度的門中心；yaw：門面朝向（0＝朝 +z） */
+export function doorway(scene, { pos, yaw = 0, w = 0.95, h = 2.1, color = '#8a6a46', frame = '#ece6d8', handle = '#b9a477' }) {
+  const g = new THREE.Group(); g.position.copy(pos); g.rotation.y = yaw;
+  const dm = mat(color, { roughness: 0.6 }), fm = mat(frame, { roughness: 0.55 }), hm = mat(handle, { roughness: 0.3, metalness: 0.8 });
+  const slab = box(w, h, 0.045, dm); slab.position.set(0, h / 2, 0.025); g.add(slab);
+  [[h * 0.71, h * 0.36], [h * 0.27, h * 0.36]].forEach(([py, ph]) => {
+    const pan = box(w * 0.66, ph, 0.012, dm); pan.position.set(0, py, 0.052); pan.castShadow = false; g.add(pan);
+    const bev = box(w * 0.72, ph + w * 0.06, 0.006, dm); bev.position.set(0, py, 0.049); bev.castShadow = false; g.add(bev);
+  });
+  const cw = 0.09;
+  [-1, 1].forEach((sd) => { const c = box(cw, h + cw, 0.03, fm); c.position.set(sd * (w / 2 + cw / 2), (h + cw) / 2, 0.015); c.castShadow = false; g.add(c); });
+  const head = box(w + cw * 2 + 0.06, cw + 0.03, 0.04, fm); head.position.set(0, h + cw / 2 + 0.01, 0.02); head.castShadow = false; g.add(head);
+  const ros = cyl(0.028, 0.028, 0.012, handle, 14); ros.material = hm; ros.rotation.x = Math.PI / 2; ros.position.set(w / 2 - 0.09, 1.0, 0.054);
+  const lever = box(0.12, 0.018, 0.018, hm); lever.position.set(w / 2 - 0.13, 1.0, 0.075);
+  const neck = cyl(0.009, 0.009, 0.03, handle, 8); neck.material = hm; neck.rotation.x = Math.PI / 2; neck.position.set(w / 2 - 0.09, 1.0, 0.066);
+  g.add(ros, lever, neck);
+  [0.25, h - 0.3].forEach((py) => { const hi = box(0.02, 0.1, 0.012, hm); hi.position.set(-w / 2 + 0.01, py, 0.05); hi.castShadow = false; g.add(hi); });
+  scene.add(g); return g;
 }
 /** 窗外景色貼圖：city（遠方的樓）、trees（綠樹草地）、campus */
 export function outsideTex(kind) {
@@ -622,7 +715,7 @@ export function outsideTex(kind) {
   }, [1, 1], 4);
 }
 /** 一扇有窗框、窗格、窗台和窗外景色的窗戶。放在 pos，面向 yaw 的方向（0＝面向 +z） */
-export function windowView(scene, { pos, yaw = 0, w = 2.1, h = 1.9, view = 'city', frame = '#8c9399', blinds = 0 }) {
+export function windowView(scene, { pos, yaw = 0, w = 2.1, h = 1.9, view = 'city', frame = '#8c9399', blinds = 0, curtain = blinds > 0 ? null : '#c9b79a', casing = '#ece6d8' }) {
   const g = new THREE.Group(); g.position.copy(pos); g.rotation.y = yaw;
   const out = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: outsideTex(view), fog: false })); out.position.z = 0.0; g.add(out);
   const fm = mat(frame, { roughness: 0.5 }), t = 0.07;
@@ -631,6 +724,13 @@ export function windowView(scene, { pos, yaw = 0, w = 2.1, h = 1.9, view = 'city
   const mv = box(0.045, h, 0.08, fm); mv.position.z = 0.04; const mh = box(w, 0.045, 0.08, fm); mh.position.set(0, h * 0.18, 0.04); g.add(mv, mh);
   const sl = box(w + 0.3, 0.06, 0.28, '#e8e3d6'); sl.position.set(0, -h / 2 - 0.05, 0.13); sl.castShadow = false; g.add(sl);
   const glassM = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.08, depthWrite: false })); glassM.position.z = 0.05; g.add(glassM);
+  // 牆上的窗框飾條（比窗框寬一圈）
+  if (casing) {
+    const cm = mat(casing, { roughness: 0.6 }), cw = 0.09, ox = w / 2 + t + cw / 2 - 0.01;
+    [-ox, ox].forEach((px) => { const c = box(cw, h + 2 * t + cw * 2, 0.025, cm); c.position.set(px, 0, 0.012); c.castShadow = false; g.add(c); });
+    const top = box(w + 2 * t + cw * 2 + 0.06, cw + 0.02, 0.035, cm); top.position.set(0, h / 2 + t + cw / 2, 0.017); top.castShadow = false; g.add(top);
+  }
+  if (curtain) addCurtains(g, { w, h, floorY: -pos.y, color: curtain });
   if (blinds > 0) { const n = Math.round(h * blinds * 14); for (let i = 0; i < n; i++) { const s = box(w - 0.05, 0.035, 0.012, '#e4dfd2'); s.position.set(0, h / 2 - 0.05 - i * (h * blinds / n), 0.07); s.rotation.x = 0.35; s.castShadow = false; g.add(s); } }
   scene.add(g); return g;
 }

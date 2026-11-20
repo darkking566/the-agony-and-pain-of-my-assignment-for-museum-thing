@@ -45,7 +45,7 @@ export function build({ scene, phone }) {
     base: '#2d3038', crown: '#e8e8e4'
   });
   // 左牆的大片窗：窗外是停機坪
-  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.5, 0.4), yaw: Math.PI / 2, w: 4.2, h: 2.0, view: 'city', frame: '#3a3f47' });
+  windowView(scene, { pos: V(-RW / 2 + 0.11, 1.5, 0.4), yaw: Math.PI / 2, w: 4.2, h: 2.0, view: 'city', frame: '#3a3f47', curtain: null, casing: null });
 
   // 候機室的座椅、櫃台、柱子與盆栽
   const seatMat = '#4a5a72';
