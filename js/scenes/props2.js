@@ -56,9 +56,11 @@ export function dirtTex(base = '#9c8660', seed = 5, repeat = [12, 1]) {
 
 /** 草叢：三片交叉的細長葉片，InstancedMesh。avoid(x,z) 回傳 true 的位置不放 */
 export function grassTufts(scene, { cx = 0, cz = 0, w = 30, d = 20, count = 700, seed = 7, colors = ['#6f8a3c', '#83994a', '#5d7432', '#9aa258'], avoid = null } = {}) {
-  const blade = (rot) => { const g = new THREE.PlaneGeometry(0.06, 0.32, 1, 2); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i) + 0.16; p.setX(i, p.getX(i) * (1 - y / 0.36)); p.setZ(i, y * y * 0.6); p.setY(i, y); } g.rotateY(rot); return g; };
+  const blade = (rot) => { const g = new THREE.PlaneGeometry(0.06, 0.32, 1, 1); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i) + 0.16; p.setX(i, p.getX(i) * (1 - y / 0.36)); p.setZ(i, y * y * 0.6); p.setY(i, y); } g.rotateY(rot); return g; };
   const parts = [0, 1, 2, 3, 4].map((i) => { const g = blade(i * 1.26); g.translate(Math.cos(i * 2.1) * 0.03, 0, Math.sin(i * 2.1) * 0.03); return g; });
   const geo = mergeGeometries(parts.map((g) => g.toNonIndexed())); parts.forEach((g) => g.dispose()); geo.computeVertexNormals();
+  // 觸控裝置（手機、平板）只種一半，減輕負擔
+  if (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) count = Math.round(count / 2);
   const m = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, side: THREE.DoubleSide });
   const im = new THREE.InstancedMesh(geo, m, count);
   const r = rng(seed), o = new THREE.Object3D(), c = new THREE.Color();
