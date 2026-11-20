@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, windowView, leafyPlant, blobShadow, vendingMachine, ceilingLights } from './props.js';
-import { seatRow, luggageCart, crtMonitor, trashCan, wallClock } from './props2.js';
+import { seatRow, luggageCart, crtMonitor, trashCan, wallClock, indoorTree } from './props2.js';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
@@ -69,8 +69,8 @@ export function build({ scene, phone }) {
   const pillar = cyl(0.3, 0.3, RH, '#e2ddd0', 24); pillar.material = new THREE.MeshStandardMaterial({ color: '#e2ddd0', roughness: 0.45 }); pillar.position.set(1.2, RH / 2, -0.4); scene.add(pillar);
   const pBase = cyl(0.38, 0.4, 0.18, '#9a9488', 24); pBase.position.set(1.2, 0.09, -0.4); scene.add(pBase);
   const pCap = cyl(0.4, 0.32, 0.16, '#d8d2c4', 24); pCap.position.set(1.2, RH - 0.08, -0.4); scene.add(pCap);
-  leafyPlant(scene, -4.6, 1.6, 1.0, 2);
-  leafyPlant(scene, 4.8, 3.0, 1.1, 1);
+  indoorTree(scene, -5.4, 3.7, { h: 2.6, seed: 8, pot: '#d8d2c4' });
+  indoorTree(scene, 4.8, 3.0, { h: 2.8, seed: 3, pot: '#d8d2c4' });
   /* ---------- 機場的其他陳設 ---------- */
   // 後牆上的出發看板
   const boardFrame = box(3.4, 1.5, 0.08, '#1d1f23'); boardFrame.position.set(-1.0, 2.3, -RD / 2 + 0.2); scene.add(boardFrame);
