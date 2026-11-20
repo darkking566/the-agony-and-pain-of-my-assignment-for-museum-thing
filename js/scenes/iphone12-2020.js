@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
-import { sofa, patternRug, bookcase, officeChair, wallClock, tableLamp, deskClutter, shelfClutter, trashCan } from './props2.js';
+import { sofa, patternRug, bookcase, officeChair, wallClock, tableLamp, deskClutter, shelfClutter, trashCan, armchair, indoorTree } from './props2.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -77,7 +77,8 @@ export function build({ scene, phone }) {
   [[-0.5, -0.24], [0.5, -0.24], [-0.5, 0.24], [0.5, 0.24]].forEach(([x, z]) => { const l = box(0.05, 0.4, 0.05, '#4a3420'); l.position.set(-1.9 + x, 0.2, -0.5 + z); scene.add(l); });
   [['#8a2a2a', 0], ['#2a5a8a', 0.04]].forEach(([c, dy]) => { const b = box(0.28, 0.04, 0.2, c); b.position.set(-1.9, 0.44 + dy, -0.5); scene.add(b); });
   leafyPlant(scene, -4.2, -3.4, 1.2, 3);
-  leafyPlant(scene, 4.1, -3.4, 1.0, 1);
+  indoorTree(scene, 4.1, -3.4, { h: 2.1, seed: 2, pot: '#e8e4dc' });
+  armchair(scene, -0.45, -0.45, -Math.PI / 2, { color: '#9a8a6a' });
   framedPicture(scene, -1.9, 2.0, -RD / 2 + 0.17, 0, 1.0, 0.7, 4);
   framedPicture(scene, 1.2, 2.2, -RD / 2 + 0.17, 0, 0.6, 0.8, 6);
   // 落地燈

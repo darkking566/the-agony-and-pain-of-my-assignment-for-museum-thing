@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, mat, box, cyl, sign, Person } from '../scene-kit.js';
 import { loadPhone, setLid, makeHolder } from './kit2.js';
 import { richRoom, ceilingLights, windowView, leafyPlant, framedPicture, surfaceTex, blobShadow } from './props.js';
-import { sofa, seatRow, crtMonitor, filingCabinet, deskClutter, trashCan, wallClock } from './props2.js';
+import { sofa, seatRow, crtMonitor, filingCabinet, deskClutter, trashCan, wallClock, armchair, indoorTree, magazineRack } from './props2.js';
 
 export function build({ scene, phone }) {
   /* ---------- 光線與大廳 ---------- */
@@ -91,7 +91,9 @@ export function build({ scene, phone }) {
   const rug = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.02, 2.2), [mat('#44566a'), mat('#44566a'), new THREE.MeshStandardMaterial({ map: rugT, roughness: 1 }), mat('#44566a'), mat('#44566a'), mat('#44566a')]); rug.position.set(0.3, 0.01, 1.2); rug.receiveShadow = true;
   const rugBorder = box(3.0, 0.005, 1.8, '#8a9db3'); rugBorder.position.set(0.3, 0.022, 1.2); rugBorder.castShadow = false;
   scene.add(bench, benchBack, ct, rug, rugBorder);
-  leafyPlant(scene, 4.4, -3.3, 1.2, 1); leafyPlant(scene, -4.4, 3.4, 1.0, 2); leafyPlant(scene, 4.4, 1.0, 0.8, 3);
+  indoorTree(scene, 4.35, -3.35, { h: 2.4, seed: 4 }); indoorTree(scene, -4.35, 3.35, { h: 2.2, seed: 7 }); leafyPlant(scene, 4.4, 1.0, 0.8, 3);
+  armchair(scene, 2.55, 1.9, Math.PI / 2, { color: '#3b4a5a', legs: '#9aa1a6' });
+  magazineRack(scene, 4.65, 2.0, -Math.PI / 2);
   ceilingLights(scene, [-3, 0, 3], [-2, 1.4], 3.59);
 
   /* ---------- 人物與手機 ---------- */

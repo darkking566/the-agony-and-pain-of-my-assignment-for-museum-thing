@@ -509,3 +509,59 @@ export function christmasTree(scene, x, z, { h = 1.9, seed = 5 } = {}) {
   });
   scene.add(g); return g;
 }
+
+/** 單人扶手椅：圓弧扶手、坐墊、靠背、木腳 */
+export function armchair(scene, x, z, rot = 0, { color = '#6a4a3a', legs = '#3a2a1c' } = {}) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot;
+  const fm = mat(color, { roughness: 0.95 });
+  g.add(merged([[B(0.8, 0.22, 0.75), 0, 0.3, 0], [B(0.8, 0.5, 0.16), 0, 0.62, -0.3], [C(0.09, 0.09, 0.75, 16), -0.36, 0.5, 0, Math.PI / 2, 0, 0], [C(0.09, 0.09, 0.75, 16), 0.36, 0.5, 0, Math.PI / 2, 0, 0], [B(0.17, 0.12, 0.75), -0.36, 0.42, 0], [B(0.17, 0.12, 0.75), 0.36, 0.42, 0]], fm));
+  const cush = new THREE.Mesh(new THREE.CapsuleGeometry(0.12, 0.38, 6, 16), mat(new THREE.Color(color).multiplyScalar(0.9).getStyle(), { roughness: 0.95 })); cush.rotation.z = Math.PI / 2; cush.scale.set(1, 1, 2.2); cush.position.set(0, 0.47, 0.05); cush.castShadow = true; g.add(cush);
+  const lm = mat(legs, { roughness: 0.6 });
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b2]) => { const l = cyl(0.025, 0.016, 0.2, lm, 10); l.position.set(a * 0.33, 0.1, b2 * 0.3); g.add(l); });
+  scene.add(g); return g;
+}
+
+/** 室內的大盆栽樹（像榕樹）：高花盆、彎曲的樹幹、多團葉子 */
+export function indoorTree(scene, x, z, { h = 2.2, seed = 3, pot = '#d8d2c4' } = {}) {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  const r = rng(seed);
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.24, 0.6, 24), mat(pot, { roughness: 0.5 })); p.position.y = 0.3; p.castShadow = true; g.add(p);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.025, 8, 24), mat(pot, { roughness: 0.5 })); rim.rotation.x = Math.PI / 2; rim.position.y = 0.6; g.add(rim);
+  const soil = cyl(0.28, 0.28, 0.02, '#3a2c20', 18); soil.position.y = 0.58; g.add(soil);
+  const pts = []; for (let i = 0; i <= 6; i++) pts.push(new THREE.Vector3(Math.sin(i * 0.9) * 0.06, 0.58 + (i / 6) * (h - 1.0), Math.cos(i * 0.7) * 0.05));
+  const trunk = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 20, 0.035, 8), mat('#6b5236', { roughness: 0.9 })); trunk.castShadow = true; g.add(trunk);
+  const leafM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, flatShading: true });
+  for (let i = 0; i < 14; i++) {
+    const rad = 0.18 + r() * 0.16, geo = new THREE.IcosahedronGeometry(rad, 2).toNonIndexed(), col = [];
+    const base = new THREE.Color(['#3f7a3a', '#4f8a42', '#2f6a34', '#5f9a48'][(r() * 4) | 0]);
+    for (let f = 0; f < geo.attributes.position.count / 3; f++) { const c = base.clone().offsetHSL(0, 0, (r() - 0.5) * 0.14); for (let k = 0; k < 3; k++) col.push(c.r, c.g, c.b); }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, leafM); const a = r() * 6.28, d = 0.1 + r() * 0.35;
+    m.position.set(Math.cos(a) * d, h - 0.7 + r() * 0.6, Math.sin(a) * d); m.scale.y = 0.85; m.castShadow = true; g.add(m);
+  }
+  scene.add(g); return g;
+}
+
+/** 吊扇：馬達、五片扇葉、燈罩 */
+export function ceilingFan(scene, x, y, z, { color = '#6b4a30', metal = '#c9b48a' } = {}) {
+  const g = new THREE.Group(); g.position.set(x, y, z);
+  const mm = mat(metal, { roughness: 0.3, metalness: 0.7 });
+  const rod = cyl(0.015, 0.015, 0.3, mm, 10); rod.position.y = -0.15; g.add(rod);
+  const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, 0.14, 24), mm); motor.position.y = -0.36; g.add(motor);
+  const bm = mat(color, { roughness: 0.6 });
+  for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; const bl = box(0.6, 0.012, 0.14, bm); bl.position.set(Math.cos(a) * 0.45, -0.38, Math.sin(a) * 0.45); bl.rotation.set(0, -a, 0.08); g.add(bl); const arm = box(0.2, 0.01, 0.03, mm); arm.position.set(Math.cos(a) * 0.18, -0.37, Math.sin(a) * 0.18); arm.rotation.y = -a; g.add(arm); }
+  const globe = new THREE.Mesh(new THREE.SphereGeometry(0.11, 24, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#fff4dc', emissive: '#ffd99a', emissiveIntensity: 0.6, roughness: 0.4, side: THREE.DoubleSide })); globe.position.y = -0.43; g.add(globe);
+  scene.add(g); return g;
+}
+
+/** 雜誌架：斜放的雜誌 */
+export function magazineRack(scene, x, z, rot = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot;
+  const am = mat('#2a2a2e', { roughness: 0.35, metalness: 0.6 });
+  const parts = [[B(0.6, 0.03, 0.3), 0, 0.02, 0], [B(0.02, 1.1, 0.02), -0.29, 0.55, -0.14], [B(0.02, 1.1, 0.02), 0.29, 0.55, -0.14]];
+  for (let i = 0; i < 3; i++) parts.push([B(0.6, 0.02, 0.06), 0, 0.3 + i * 0.32, 0.06]);
+  g.add(merged(parts, am));
+  const cols = ['#c0503a', '#2f5d8a', '#e0d6c0', '#3a8a5a', '#d9b25a', '#7a3a6a'];
+  for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) { const m = box(0.24, 0.32, 0.01, cols[(i * 2 + k) % 6]); m.position.set(-0.14 + k * 0.28, 0.45 + i * 0.32, 0.0); m.rotation.x = -0.3; m.castShadow = false; g.add(m); }
+  scene.add(g); return g;
+}

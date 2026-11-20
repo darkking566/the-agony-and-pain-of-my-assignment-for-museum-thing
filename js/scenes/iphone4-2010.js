@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway, pendantLamp } from './props.js';
-import { sofa, patternRug, bookcase, kitchenRun, fridge, chair, tvSet, wallClock, tableLamp } from './props2.js';
+import { sofa, patternRug, bookcase, kitchenRun, fridge, chair, tvSet, wallClock, tableLamp, armchair, indoorTree, ceilingFan } from './props2.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -48,7 +48,9 @@ export function build({ scene, phone }) {
   tableLamp(scene, -4.3, 0.55, -2.5, { shade: '#efe3c4' });
   const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 12), new THREE.MeshStandardMaterial({ color: '#f2efe8' }));
   mug.position.set(-0.8, 0.58, -1.6); scene.add(mug);
-  leafyPlant(scene, 3.6, -3.2, 1.1, 2);
+  indoorTree(scene, 3.7, -3.3, { h: 2.1, seed: 5, pot: '#8a5a3a' });
+  armchair(scene, 0.95, -1.7, -Math.PI / 2, { color: '#7a5a3a' });
+  ceilingFan(scene, 0, RH, 0.6);
   framedPicture(scene, -0.8, 1.9, -RD / 2 + 0.17, 0, 0.9, 0.7, 2);
 
   /* ---------- 客廳的其他陳設 ---------- */

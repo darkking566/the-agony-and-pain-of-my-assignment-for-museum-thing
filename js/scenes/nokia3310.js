@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { V, span, lerp, mat, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, ceilingLights, windowView, leafyPlant, framedPicture, blobShadow, surfaceTex, doorway } from './props.js';
+import { indoorTree, trashCan } from './props2.js';
 
 export function build({ scene, phone }) {
   /* ---------- 光線與房間 ---------- */
@@ -122,7 +123,8 @@ export function build({ scene, phone }) {
   // 教室裡的小東西：垃圾桶、海報、窗台上的盆栽
   { const bin = cyl(0.17, 0.14, 0.4, '#5a6a72', 12); bin.position.set(4.2, 0.2, 2.9); scene.add(bin); }
   framedPicture(scene, RW / 2 - 0.12, 1.9, 0.3, -Math.PI / 2, 0.9, 0.65, 1);
-  leafyPlant(scene, -4.2, -3.5, 0.9, 2, '#6a5a3b');
+  indoorTree(scene, -4.1, -3.45, { h: 2.0, seed: 6, pot: '#6a5a3b' });
+  trashCan(scene, 4.1, 3.4, { color: '#5a7a6a' });
 
   /* ---------- 人物 ---------- */
   const people = [];
