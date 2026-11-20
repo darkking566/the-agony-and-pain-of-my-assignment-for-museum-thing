@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, windowView, leafyPlant, blobShadow, vendingMachine, ceilingLights } from './props.js';
+import { seatRow, luggageCart, crtMonitor, trashCan, wallClock } from './props2.js';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
@@ -37,7 +38,7 @@ export function build({ scene, phone }) {
   const RW = 12, RD = 9, RH = 3.6;
   richRoom(scene, {
     w: RW, d: RD, h: RH,
-    floor: { kind: 'parquet', color: '#8a8478', size: 2, rough: 0.5 },
+    floor: { kind: 'terrazzo', color: '#c9c4b8', size: 2, rough: 0.3 },
     wall: { kind: 'plaster', color: '#d4d8dc', size: 3 },
     wallBack: { kind: 'plaster', color: '#c9ced3', size: 3 },
     wallRight: { kind: 'plaster', color: '#d4d8dc', size: 3 },
@@ -49,14 +50,25 @@ export function build({ scene, phone }) {
 
   // 候機室的座椅、櫃台、柱子與盆栽
   const seatMat = '#4a5a72';
-  [[2.4, -2.9], [3.8, -2.9], [2.4, -1.6], [3.8, -1.6]].forEach(([x, z]) => {
-    const seat = box(0.9, 0.12, 0.7, seatMat); seat.position.set(x, 0.45, z); scene.add(seat);
-    const back = box(0.9, 0.5, 0.1, seatMat); back.position.set(x, 0.75, z - 0.3); scene.add(back);
-    const legs = box(0.8, 0.4, 0.6, '#3a3f47'); legs.position.set(x, 0.2, z); scene.add(legs);
-  });
+  seatRow(scene, 3.1, -2.9, 0, { n: 5, color: seatMat });
+  seatRow(scene, 3.1, -1.6, 0, { n: 5, color: seatMat });
+  seatRow(scene, -4.9, -0.9, Math.PI / 2, { n: 4, color: seatMat });
+  // 報到櫃台：前板、檯面、電腦終端機、行李秤、上方招牌
+  const ciBack = box(2.8, 1.6, 0.1, '#2a3a5a'); ciBack.position.set(-3.6, 1.9, -RD / 2 + 0.16); scene.add(ciBack);
+  const ciSign = sign('CHECK-IN  報到', 2.4, 0.4, { bg: '#2a3a5a', color: '#ffffff', size: 70, w: 1024, h: 170, weight: 800 }); ciSign.position.set(-3.6, 2.4, -RD / 2 + 0.22); scene.add(ciSign);
+  crtMonitor(scene, -4.1, 1.045, -3.5, Math.PI, { w: 0.36, screen: '#0c2a1a' });
+  crtMonitor(scene, -3.0, 1.045, -3.5, Math.PI, { w: 0.36, screen: '#0c2a1a' });
+  const scale = box(0.6, 0.12, 0.5, '#9aa0a6', { roughness: 0.3, metalness: 0.6 }); scale.position.set(-2.0, 0.06, -3.3); scene.add(scale);
+  const belt = box(0.6, 0.012, 0.5, '#2a2a2e'); belt.position.set(-2.0, 0.126, -3.3); scene.add(belt);
+  [-1.85, -5.35].forEach((x) => { const post = cyl(0.04, 0.05, 0.95, '#c9ced3', 10); post.position.set(x + 0.1, 0.475, -2.6); scene.add(post); });
+  const strap = box(3.3, 0.06, 0.01, '#2a4a8a'); strap.position.set(-3.55, 0.88, -2.6); scene.add(strap);
+  trashCan(scene, 1.8, -3.9); trashCan(scene, -2.2, 3.6); trashCan(scene, 4.9, -0.8);
+  wallClock(scene, 1.6, 2.7, -RD / 2 + 0.12, 0, { r: 0.24 });
   const counter = box(2.6, 1.0, 0.7, '#5a4a3c'); counter.position.set(-3.6, 0.5, -3.6); scene.add(counter);
   const counterTop = box(2.7, 0.05, 0.8, '#d8cdbb'); counterTop.position.set(-3.6, 1.02, -3.6); scene.add(counterTop);
-  const pillar = cyl(0.3, 0.3, RH, '#e2ddd0', 16); pillar.position.set(1.2, RH / 2, -0.4); scene.add(pillar);
+  const pillar = cyl(0.3, 0.3, RH, '#e2ddd0', 24); pillar.material = new THREE.MeshStandardMaterial({ color: '#e2ddd0', roughness: 0.45 }); pillar.position.set(1.2, RH / 2, -0.4); scene.add(pillar);
+  const pBase = cyl(0.38, 0.4, 0.18, '#9a9488', 24); pBase.position.set(1.2, 0.09, -0.4); scene.add(pBase);
+  const pCap = cyl(0.4, 0.32, 0.16, '#d8d2c4', 24); pCap.position.set(1.2, RH - 0.08, -0.4); scene.add(pCap);
   leafyPlant(scene, -4.6, 1.6, 1.0, 2);
   leafyPlant(scene, 4.8, 3.0, 1.1, 1);
   /* ---------- 機場的其他陳設 ---------- */
@@ -71,11 +83,8 @@ export function build({ scene, phone }) {
   dHead.position.set(-1.0, 3.0, -RD / 2 + 0.25); scene.add(dHead);
   // 自動販賣機與行李車
   vendingMachine(scene, 4.6, -3.9, 0, 2);
-  const cart = box(0.9, 0.9, 0.55, '#8a7a5a'); cart.position.set(-4.4, 0.45, -1.2); scene.add(cart);
-  const cartTop = box(0.9, 0.05, 0.55, '#6b5c44'); cartTop.position.set(-4.4, 0.92, -1.2); scene.add(cartTop);
-  [[-0.35, 0.22], [0.35, 0.22]].forEach(([x, z]) => {
-    const wheel = cyl(0.07, 0.07, 0.04, '#1d1d1f', 10); wheel.rotation.x = Math.PI / 2; wheel.position.set(-4.4 + x, 0.07, -1.2 + z); scene.add(wheel);
-  });
+  luggageCart(scene, -2.9, -1.9, 0.4);
+  luggageCart(scene, 4.4, 2.6, -2.2);
   // 天花板的燈
   ceilingLights(scene, [-3, 0, 3], [-2.2, 1.2], RH - 0.1, 1.0, 0.25, '#fff6e0');
 

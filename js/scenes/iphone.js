@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { V, span, lerp, mat, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, ceilingLights, windowView, leafyPlant, framedPicture, blobShadow, surfaceTex } from './props.js';
+import { chair, sofa, shelfClutter, trashCan, wallClock } from './props2.js';
 
 export function build({ scene, phone }) {
   /* ---------- 光線與房間 ---------- */
@@ -29,6 +30,18 @@ export function build({ scene, phone }) {
   const counter = box(5.2, 1.05, 0.7, '#5a3f2b'); counter.position.set(0.5, 0.525, -2.9);
   const counterTop = box(5.3, 0.06, 0.8, '#d8cdbb'); counterTop.position.set(0.5, 1.08, -2.9);
   scene.add(counter, counterTop);
+  // 吧台正面的直條木板與黃銅腳踏桿
+  for (let i = 0; i < 26; i++) { const sl = box(0.18, 0.95, 0.02, i % 2 ? '#5f432e' : '#553b28'); sl.position.set(0.5 - 2.6 + 0.1 + i * 0.2, 0.5, -2.54); sl.castShadow = false; scene.add(sl); }
+  const rail = cyl(0.025, 0.025, 5.0, '#c9a24a', 10); rail.material = mat('#c9a24a', { roughness: 0.25, metalness: 0.85 }); rail.rotation.z = Math.PI / 2; rail.position.set(0.5, 0.22, -2.42); scene.add(rail);
+  [-1.8, 0.5, 2.8].forEach((x) => { const br = box(0.03, 0.03, 0.12, rail.material); br.position.set(x, 0.22, -2.48); scene.add(br); });
+  // 收銀機、磨豆機、小費罐、餐巾紙
+  const reg = box(0.38, 0.18, 0.32, '#2a2a2e', { roughness: 0.4 }); reg.position.set(-0.1, 1.2, -2.8); scene.add(reg);
+  const regS = box(0.26, 0.16, 0.03, '#1a1a1e'); regS.position.set(-0.1, 1.36, -2.92); regS.rotation.x = -0.4; scene.add(regS);
+  const regG = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.12), new THREE.MeshBasicMaterial({ color: '#7fd6a0' })); regG.position.set(-0.1, 1.365, -2.9); regG.rotation.x = -0.4; scene.add(regG);
+  const grinder = cyl(0.09, 0.11, 0.28, '#3b3f45', 14); grinder.position.set(-2.0, 1.25, -2.95); scene.add(grinder);
+  const hopper = cyl(0.1, 0.05, 0.18, '#3b3f45', 14); hopper.material = new THREE.MeshStandardMaterial({ color: '#6a4a2a', transparent: true, opacity: 0.6, roughness: 0.1 }); hopper.position.set(-2.0, 1.48, -2.95); scene.add(hopper);
+  const jar = cyl(0.06, 0.06, 0.14, '#cfe3ea', 14); jar.material = new THREE.MeshStandardMaterial({ color: '#d6e8ef', transparent: true, opacity: 0.45, roughness: 0.05 }); jar.position.set(0.3, 1.18, -2.65); scene.add(jar);
+  const nap = box(0.14, 0.1, 0.1, '#c9ced3', { metalness: 0.6, roughness: 0.3 }); nap.position.set(0.55, 1.16, -2.7); scene.add(nap);
   const machine = new THREE.Group();
   const mb = box(0.9, 0.55, 0.5, '#b9bec4', { metalness: 0.7, roughness: 0.3 }); mb.position.y = 0.3;
   const mt = box(0.9, 0.12, 0.5, '#3b3f45'); mt.position.y = 0.62;
@@ -66,12 +79,29 @@ export function build({ scene, phone }) {
     scene.add(cup, cup2);
   }
   stool(-2.6, 0.2); stool(-2.6, 1.4); stool(3.4, 1.8);
-  // 窗邊小桌
-  [[-3.4, -1.0], [-3.4, 1.6]].forEach(([x, z]) => {
+  // 窗邊小桌，每桌兩把椅子、桌上有杯子
+  [[-3.4, -1.0], [-3.4, 1.6]].forEach(([x, z], i) => {
     const top = cyl(0.35, 0.35, 0.04, '#cdbb98', 18); top.position.set(x, 0.74, z);
     const pole = cyl(0.04, 0.04, 0.72, '#4a4f55', 6); pole.position.set(x, 0.36, z);
-    scene.add(top, pole);
+    const foot = cyl(0.22, 0.24, 0.03, '#4a4f55', 16); foot.position.set(x, 0.015, z);
+    scene.add(top, pole, foot);
+    chair(scene, x, z - 0.6, 0, { color: '#3b2a1c' }); chair(scene, x, z + 0.6, Math.PI, { color: '#3b2a1c' });
+    const c = cyl(0.045, 0.04, 0.08, i ? '#e8d9c0' : '#f2efe8', 12); c.position.set(x + 0.1, 0.8, z - 0.05); scene.add(c);
+    const sauc = cyl(0.08, 0.07, 0.012, '#f2efe8', 16); sauc.position.set(x + 0.1, 0.766, z - 0.05); scene.add(sauc);
   });
+  // 右牆（磚牆）的長沙發、小桌、上方的層架
+  sofa(scene, 4.05, 0.2, -Math.PI / 2, { w: 2.2, color: '#6a3b2a', legs: '#2a1c12', pillows: ['#c9a46a', '#3f5a4a'] });
+  const st = cyl(0.3, 0.3, 0.04, '#cdbb98', 18); st.position.set(3.25, 0.55, 0.2); scene.add(st);
+  const stp = cyl(0.035, 0.035, 0.53, '#4a4f55', 6); stp.position.set(3.25, 0.27, 0.2); scene.add(stp);
+  const shelfB = box(0.24, 0.04, 1.8, '#5a3f2b'); shelfB.position.set(RW / 2 - 0.22, 1.85, 0.2); scene.add(shelfB);
+  shelfClutter(scene, RW / 2 - 0.22, 1.87, 1.0, 1.6, { seed: 21, rot: Math.PI / 2, depth: 0.18 });
+  wallClock(scene, RW / 2 - 0.12, 2.5, -1.8, -Math.PI / 2, { r: 0.2, rim: '#3b2a1c' });
+  trashCan(scene, -0.6, 3.4, { color: '#3b3f45' });
+  // 門口的小黑板立牌
+  { const g = new THREE.Group(); g.position.set(-1.6, 0, 3.2); g.rotation.y = 0.3;
+    [-1, 1].forEach((e) => { const p = box(0.5, 0.8, 0.025, '#5a3f2b'); p.position.set(0, 0.38, e * 0.12); p.rotation.x = e * -0.16; g.add(p); });
+    const t = sign('今日推薦', 0.42, 0.62, { bg: '#26302b', color: '#f3ead6', size: 52, w: 256, h: 380, weight: 700 }); t.position.set(0, 0.4, 0.14); t.rotation.x = -0.16; g.add(t);
+    scene.add(g); }
   // 盆栽、掛畫、玻璃蛋糕櫃、吧台後的杯架
   leafyPlant(scene, 4.0, -3.4, 1.1, 1); leafyPlant(scene, -4.0, 3.3, 1.0, 2);
   framedPicture(scene, -3.6, 2.1, -RD / 2 + 0.17, 0, 0.7, 0.9, 1); framedPicture(scene, 4.2, 2.0, -RD / 2 + 0.17, 0, 0.6, 0.8, 2);

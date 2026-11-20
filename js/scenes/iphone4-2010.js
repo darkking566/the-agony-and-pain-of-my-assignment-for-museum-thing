@@ -4,7 +4,8 @@
 import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
-import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
+import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway, pendantLamp } from './props.js';
+import { sofa, patternRug, bookcase, kitchenRun, fridge, chair, tvSet, wallClock, tableLamp } from './props2.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -36,13 +37,15 @@ export function build({ scene, phone }) {
   ceilingLights(scene, [-1.5, 1.5], [-1.0], RH - 0.1, 0.9, 0.2, '#ffe2a8');
 
   /* ---------- 沙發、茶几、盆栽、掛畫 ---------- */
-  const sofaMat = '#4a5a6a';
-  const sofa = box(3.0, 0.45, 1.0, sofaMat); sofa.position.set(-2.6, 0.35, -2.4); scene.add(sofa);
-  const sofaBack = box(3.0, 0.7, 0.25, sofaMat); sofaBack.position.set(-2.6, 0.8, -2.85); scene.add(sofaBack);
+  sofa(scene, -2.6, -2.45, 0, { w: 2.8, color: '#4a5a6a', pillows: ['#d9a441', '#6a8a6a'] });
   const table = box(1.4, 0.06, 0.7, '#6b4a30'); table.position.set(-0.4, 0.5, -1.7); scene.add(table);
-  [[-0.6, -0.25], [-0.2, -0.25], [-0.6, 0.25], [-0.2, 0.25]].forEach(([x, z]) => {
+  const tableShelf = box(1.3, 0.03, 0.6, '#5a3d26'); tableShelf.position.set(-0.4, 0.14, -1.7); scene.add(tableShelf);
+  [[-0.65, -0.3], [-0.15, -0.3], [-0.65, 0.3], [-0.15, 0.3]].forEach(([x, z]) => {
     const leg = box(0.05, 0.5, 0.05, '#4a3420'); leg.position.set(-0.4 + x, 0.25, -1.7 + z); scene.add(leg);
   });
+  // 沙發旁的邊几與檯燈
+  const side = box(0.45, 0.55, 0.45, '#5a3d26'); side.position.set(-4.3, 0.275, -2.5); scene.add(side);
+  tableLamp(scene, -4.3, 0.55, -2.5, { shade: '#efe3c4' });
   const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 12), new THREE.MeshStandardMaterial({ color: '#f2efe8' }));
   mug.position.set(-0.8, 0.58, -1.6); scene.add(mug);
   leafyPlant(scene, 3.6, -3.2, 1.1, 2);
@@ -50,49 +53,33 @@ export function build({ scene, phone }) {
 
   /* ---------- 客廳的其他陳設 ---------- */
   // 右牆的書櫃，書脊是各種顏色的小方塊
-  const shelf = box(0.35, 2.0, 2.2, '#5a4030'); shelf.position.set(RW / 2 - 0.2, 1.0, -0.8); scene.add(shelf);
-  const bookCols = ['#8a2a2a', '#2a5a8a', '#d9b84a', '#3a7a4a', '#f2efe8', '#5a3a7a'];
-  for (let row = 0; row < 4; row++) for (let i = 0; i < 9; i++) {
-    const bk = box(0.06, 0.26, 0.16, bookCols[(row * 3 + i) % bookCols.length]);
-    bk.position.set(RW / 2 - 0.36, 0.3 + row * 0.5, -1.9 + i * 0.22); scene.add(bk);
-  }
+  bookcase(scene, RW / 2 - 0.27, -0.8, -Math.PI / 2, { w: 2.2, h: 2.0, d: 0.34, color: '#5a4030', shelves: 4, seed: 3 });
   // 電視（關著，螢幕微微反光）與矮櫃
   const tvStand = box(1.6, 0.4, 0.45, '#2e2a26'); tvStand.position.set(2.6, 0.2, -RD / 2 + 0.5); scene.add(tvStand);
-  const tv = box(1.5, 0.85, 0.07, '#17181b'); tv.position.set(2.6, 0.85, -RD / 2 + 0.36); scene.add(tv);
-  const tvGlass = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.72), new THREE.MeshStandardMaterial({ color: '#1f2a36', roughness: 0.1, metalness: 0.3 }));
-  tvGlass.position.set(2.6, 0.85, -RD / 2 + 0.4); scene.add(tvGlass);
+  const tvDoors = box(1.5, 0.3, 0.02, '#3a342e'); tvDoors.position.set(2.6, 0.2, -RD / 2 + 0.735); scene.add(tvDoors);
+  tvSet(scene, 2.6, 0.4, -RD / 2 + 0.45, 0, { w: 1.2 });
   // 地毯與落地燈
-  const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.2), new THREE.MeshStandardMaterial({ color: '#7a3b3b', roughness: 1 }));
-  rug.rotation.x = -Math.PI / 2; rug.position.set(-1.6, 0.012, -1.4); rug.receiveShadow = true; scene.add(rug);
+  patternRug(scene, -1.6, -1.4, 3.2, 2.2, { base: '#7a3b3b', border: '#d8c39a', accent: '#2f3f5a', seed: 5 });
   const lampPole = box(0.05, 1.5, 0.05, '#3a3a3e'); lampPole.position.set(-3.6, 0.75, 0.9); scene.add(lampPole);
   const lampShade = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 0.32, 14, 1, true), new THREE.MeshStandardMaterial({ color: '#f2e6c8', emissive: '#ffd58a', emissiveIntensity: 0.6, side: THREE.DoubleSide }));
   lampShade.position.set(-3.6, 1.6, 0.9); scene.add(lampShade);
   // 後方的廚房：流理台、冰箱、爐子、牆上的小掛鐘
-  const counter = box(2.6, 0.9, 0.65, '#e8e2d4'); counter.position.set(-2.4, 0.45, -RD / 2 + 0.4); scene.add(counter);
-  const counterTop = box(2.7, 0.04, 0.7, '#3a3a40', { roughness: 0.3, metalness: 0.3 }); counterTop.position.set(-2.4, 0.92, -RD / 2 + 0.4); scene.add(counterTop);
-  const fridge = box(0.8, 1.9, 0.7, '#d8dde2', { roughness: 0.3, metalness: 0.4 }); fridge.position.set(-4.1, 0.95, -RD / 2 + 0.4); scene.add(fridge);
-  const fridgeDoor = box(0.02, 0.5, 0.02, '#8a9199'); fridgeDoor.position.set(-3.7, 1.3, -RD / 2 + 0.7); scene.add(fridgeDoor);
-  const stove = box(0.7, 0.04, 0.6, '#1a1a1e'); stove.position.set(-2.0, 0.95, -RD / 2 + 0.4); scene.add(stove);
-  const hood = box(0.8, 0.3, 0.6, '#c9ced3'); hood.position.set(-2.0, 2.4, -RD / 2 + 0.4); scene.add(hood);
-  const clock = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.04, 20), new THREE.MeshStandardMaterial({ color: '#f5f2ea' }));
-  clock.rotation.x = Math.PI / 2; clock.position.set(1.2, 2.5, -RD / 2 + 0.18); scene.add(clock);
-  const hand1 = box(0.02, 0.16, 0.01, '#222'); hand1.position.set(1.2, 2.56, -RD / 2 + 0.2); scene.add(hand1);
+  kitchenRun(scene, -3.65, -RD / 2 + 0.1, 2.5, { cab: '#e8e2d4', top: '#3a3a40', sinkAt: 0.25, stoveAt: 0.74 });
+  const hood = box(0.8, 0.3, 0.5, '#c9ced3', { roughness: 0.3, metalness: 0.5 }); hood.position.set(-1.8, 2.45, -RD / 2 + 0.35); scene.add(hood);
+  fridge(scene, -4.05, -RD / 2 + 0.45, 0);
+  wallClock(scene, 1.2, 2.45, -RD / 2 + 0.12, 0, { r: 0.2 });
   // 餐桌與吊燈（客廳和廚房之間）
   const dtable = box(1.4, 0.06, 0.9, '#6b4a30'); dtable.position.set(-4.0, 0.76, 1.6); scene.add(dtable);
   [[-0.6, -0.36], [0.6, -0.36], [-0.6, 0.36], [0.6, 0.36]].forEach(([x, z]) => {
     const leg = box(0.06, 0.74, 0.06, '#4a3420'); leg.position.set(-4.0 + x, 0.37, 1.6 + z); scene.add(leg);
   });
-  [-0.4, 0.4].forEach((x) => {
-    const chair = box(0.42, 0.06, 0.42, '#7a5a3a'); chair.position.set(-4.0 + x, 0.45, 2.3); scene.add(chair);
-    const back = box(0.42, 0.5, 0.05, '#7a5a3a'); back.position.set(-4.0 + x, 0.72, 2.5); scene.add(back);
-  });
-  const pendant = box(0.02, 1.0, 0.02, '#222'); pendant.position.set(-4.0, 2.7, 1.6); scene.add(pendant);
-  const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.36, 0.28, 16), new THREE.MeshStandardMaterial({ color: '#2a2a30' }));
-  shade.position.set(-4.0, 2.1, 1.6); scene.add(shade);
+  [-0.4, 0.4].forEach((x) => chair(scene, -4.0 + x, 2.3, Math.PI, { color: '#7a5a3a' }));
+  chair(scene, -4.0, 0.9, 0, { color: '#7a5a3a' });
+  pendantLamp(scene, -4.0, RH, 1.6, { drop: 1.0, shade: '#2a2a30', r: 0.3 });
+  // 餐桌上的碗盤與水瓶
+  [-0.35, 0.35].forEach((dx) => { const pl = cyl(0.11, 0.09, 0.02, '#f4f2ec', 18); pl.position.set(-4.0 + dx, 0.8, 1.6); scene.add(pl); });
+  const jug = cyl(0.06, 0.07, 0.22, '#cfe3ea', 14); jug.material = new THREE.MeshStandardMaterial({ color: '#cfe3ea', transparent: true, opacity: 0.6, roughness: 0.1 }); jug.position.set(-4.0, 0.9, 1.55); scene.add(jug);
   // 沙發的靠墊與茶几上的書
-  [[-3.1, -2.6], [-2.2, -2.6]].forEach(([x, z], i) => {
-    const pillow = box(0.42, 0.36, 0.14, ['#d9a441', '#6a8a6a'][i], { roughness: 0.9 }); pillow.position.set(x, 0.72, z + 0.3); scene.add(pillow);
-  });
   [['#8a2a2a', 0], ['#2a5a8a', 0.04], ['#d9b84a', 0.08]].forEach(([c, dy]) => {
     const bk = box(0.3, 0.05, 0.22, c); bk.position.set(-0.3, 0.6 + dy, -1.5); scene.add(bk);
   });

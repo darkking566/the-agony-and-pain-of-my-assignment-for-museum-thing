@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { V, span, lerp, box, cyl, sign, Person, placeBetween } from '../scene-kit.js';
 import { cloudSky, leafTree, GREEN, blobShadow } from './props.js';
+import { grassTex, dirtTex, grassTufts, rocks, ridgeTent, willysJeep, sandbags, plankCrate, wirePoles } from './props2.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -34,13 +35,13 @@ export function build({ scene }) {
   sun.shadow.bias = -0.0006;
   scene.add(sun, sun.target);
 
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: '#7d8a4e', roughness: 1 }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: '#ffffff', map: grassTex('#7d8a4e', 3, [40, 40]), roughness: 1 }));
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.02;
   ground.receiveShadow = true;
   scene.add(ground);
   // 一條泥土小路，從左邊延伸到人物的位置
-  const path = new THREE.Mesh(new THREE.PlaneGeometry(60, 3), new THREE.MeshStandardMaterial({ color: '#9c8660', roughness: 1 }));
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(60, 3), new THREE.MeshStandardMaterial({ map: dirtTex('#9c8660', 5, [14, 1]), roughness: 1 }));
   path.rotation.x = -Math.PI / 2;
   path.position.set(-6, 0, 0.5);
   path.receiveShadow = true;
@@ -51,8 +52,9 @@ export function build({ scene }) {
     const post = box(0.12, 0.9, 0.12, '#6b5034'); post.position.set(x, 0.45, -3); scene.add(post);
   }
   [0.4, 0.75].forEach((y) => { const rail = box(24, 0.08, 0.08, '#7a5c3c'); rail.position.set(0, y, -3); scene.add(rail); });
-  const crate1 = box(0.8, 0.6, 0.8, '#7a6040'); crate1.position.set(4.2, 0.3, -0.6); scene.add(crate1);
-  const crate2 = box(0.7, 0.5, 0.7, '#6b5538'); crate2.position.set(5.1, 0.25, -0.3); scene.add(crate2);
+  plankCrate(scene, 4.2, 0.3, -0.6, { w: 0.8, h: 0.6, d: 0.8, color: '#7a6040', rot: 0.1 });
+  plankCrate(scene, 5.1, 0.25, -0.3, { w: 0.7, h: 0.5, d: 0.7, color: '#6b5538', rot: -0.2 });
+  plankCrate(scene, 4.35, 0.85, -0.6, { w: 0.6, h: 0.5, d: 0.55, color: '#6b5538', rot: 0.35 });
   leafTree(scene, -9, -6, 3, 1.2, GREEN);
   leafTree(scene, 8, -7, 7, 1.1, GREEN);
   leafTree(scene, -4, -10, 11, 1.0, GREEN);
@@ -81,20 +83,16 @@ export function build({ scene }) {
 
   /* ---------- 營區的其他陳設與背景的士兵 ---------- */
   // 帳篷（四角錐）與吉普車（簡化的方塊造型）
-  const tent = new THREE.Mesh(new THREE.ConeGeometry(1.4, 1.5, 4), new THREE.MeshStandardMaterial({ color: '#6b7248', roughness: 1 }));
-  tent.rotation.y = Math.PI / 4; tent.position.set(-6.5, 0.75, -4.5); tent.castShadow = true; scene.add(tent);
-  const jeepBody = box(2.2, 0.6, 1.2, '#4a5234'); jeepBody.position.set(7.0, 0.5, -3.5); scene.add(jeepBody);
-  const jeepCab = box(1.0, 0.55, 1.1, '#4a5234'); jeepCab.position.set(6.4, 1.05, -3.5); scene.add(jeepCab);
-  [[-0.7, 0.6], [0.7, 0.6], [-0.7, -0.6], [0.7, -0.6]].forEach(([x, z]) => {
-    const w = cyl(0.3, 0.3, 0.2, '#1d1d1f', 12); w.rotation.x = Math.PI / 2; w.position.set(7.0 + x, 0.3, -3.5 + z); scene.add(w);
-  });
+  ridgeTent(scene, -6.5, -4.6, 0.25, { w: 2.2, l: 2.8, h: 1.6, color: '#6b7248' });
+  willysJeep(scene, 7.0, -3.5, -0.35, '#4a5234');
   // 旗桿與旗子
   const pole = cyl(0.04, 0.04, 3.2, '#c9c3b0', 8); pole.position.set(-2.8, 1.6, -6.0); scene.add(pole);
-  const flag = box(0.9, 0.5, 0.02, '#b8382c'); flag.position.set(-2.3, 2.7, -6.0); scene.add(flag);
+  const flag = new THREE.Mesh((() => { const g = new THREE.PlaneGeometry(0.9, 0.5, 12, 1); const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const u = p.getX(i) + 0.45; p.setZ(i, Math.sin(u * 7) * 0.06 * u); } g.computeVertexNormals(); return g; })(), new THREE.MeshStandardMaterial({ color: '#b8382c', roughness: 0.9, side: THREE.DoubleSide }));
+  flag.position.set(-2.3, 2.85, -6.0); flag.castShadow = true; scene.add(flag);
+  const finial = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), new THREE.MeshStandardMaterial({ color: '#c9a84a', metalness: 0.7, roughness: 0.3 })); finial.position.set(-2.8, 3.25, -6.0); scene.add(finial);
   // 沙包（靠在柵欄旁）
-  for (let i = 0; i < 6; i++) {
-    const sb = box(0.5, 0.22, 0.3, '#8a7a55'); sb.position.set(-4.2 + (i % 3) * 0.52, 0.12 + Math.floor(i / 3) * 0.2, -2.5); scene.add(sb);
-  }
+  sandbags(scene, -3.7, -1.2, { r: 1.3, a0: -0.75, a1: 0.75, rows: 3, color: '#8a7a55', seed: 3 });
+  sandbags(scene, 8.6, -7.2, { r: 2.0, a0: -1.2, a1: 0.4, rows: 4, color: '#80724f', seed: 8 });
   // 背景的士兵：一位站在營區邊，一位在柵欄後面來回走
   const sold1 = add(new Person({ top: '#4a5234', bottom: '#3e4530', hair: '#2a2018', skin: '#c99a72', height: 0.97 }));
   const sold2 = add(new Person({ top: '#5a6440', bottom: '#4a5034', hair: '#1f1712', skin: '#e0b494', height: 1.0 }));
@@ -114,10 +112,7 @@ export function build({ scene }) {
     truck.position.set(-7.4, 0, -7.6); truck.rotation.y = 0.2; scene.add(truck);
   }
   // 第二排帳篷
-  [[2.6, -6.4], [3.9, -6.4], [5.2, -6.4]].forEach(([x, z]) => {
-    const t = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.2, 4), new THREE.MeshStandardMaterial({ color: '#7a7f55', roughness: 1 }));
-    t.rotation.y = Math.PI / 4; t.position.set(x, 0.6, z); t.castShadow = true; scene.add(t);
-  });
+  [[1.4, -8.6], [3.9, -8.9], [6.4, -8.6]].forEach(([x, z], i) => ridgeTent(scene, x, z, (i - 1) * 0.08, { w: 1.8, l: 2.3, h: 1.3, color: ['#7a7f55', '#6f7550', '#7a7f55'][i] }));
   // 油桶堆（三層）
   [[0, 0.4, -4.2], [0.55, 0.4, -4.2], [0.28, 1.2, -4.2], [-0.2, 0.4, -4.8], [0.4, 0.4, -4.8]].forEach(([x, y, z]) => {
     const drum = cyl(0.25, 0.25, 0.8, '#3f5a3a', 14); drum.position.set(x + 5.8, y, z); scene.add(drum);
@@ -143,11 +138,15 @@ export function build({ scene }) {
   const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: '#ff5a4a' }));
   beacon.position.set(towerX, 6.6, towerZ); scene.add(beacon);
   // 補給區：堆疊的木箱（上面有模板字樣）、油桶
-  for (let i = 0; i < 4; i++) {
-    const crate = box(0.9, 0.7, 0.7, i % 2 ? '#7a6040' : '#6b5538'); crate.position.set(-8.4 + (i % 2) * 0.95, 0.35 + Math.floor(i / 2) * 0.7, -6.4); scene.add(crate);
-  }
+  for (let i = 0; i < 4; i++) plankCrate(scene, -8.4 + (i % 2) * 0.95, 0.35 + Math.floor(i / 2) * 0.7, -6.4, { w: 0.9, h: 0.7, d: 0.7, color: i % 2 ? '#7a6040' : '#6b5538' });
   const stencil = sign('U.S.', 0.5, 0.3, { bg: '#6b5538', color: '#e8dcae', size: 70, w: 256, h: 160, weight: 800 });
-  stencil.position.set(-8.4, 0.4, -6.04); scene.add(stencil);
+  stencil.position.set(-8.4, 0.4, -6.025); scene.add(stencil);
+  // 草叢、石頭、野戰電話線（從通信塔拉向指揮所）
+  const onPath = (x, z) => Math.abs(z - 0.5) < 1.7 || (Math.abs(x + 0.6) < 1.2 && z > -1 && z < 4);
+  grassTufts(scene, { cx: 0, cz: -4, w: 34, d: 22, count: 2600, seed: 4, avoid: onPath });
+  grassTufts(scene, { cx: 0, cz: 6, w: 30, d: 8, count: 900, seed: 9, avoid: onPath });
+  rocks(scene, { cx: 0, cz: -2, w: 30, d: 18, count: 60, seed: 5 });
+  wirePoles(scene, [[9.5, -10], [5.5, -11.2], [1.5, -11.6], [-2.5, -11.4], [-6.5, -10.8]], { h: 4.0 });
   [[-6.0, -7.0], [-5.4, -7.0], [-6.7, -7.0]].forEach(([x, z]) => {
     const drum = cyl(0.25, 0.25, 0.8, '#3f5a3a', 14); drum.position.set(x, 0.4, z); scene.add(drum);
   });

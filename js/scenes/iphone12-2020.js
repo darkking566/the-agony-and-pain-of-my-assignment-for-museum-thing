@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { V, span, lerp, box, cyl, Person, placeBetween } from '../scene-kit.js';
 import { buildPhone } from '../hall3d.js';
 import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
+import { sofa, patternRug, bookcase, officeChair, wallClock, tableLamp, deskClutter, shelfClutter, trashCan } from './props2.js';
 
 const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
 const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -59,16 +60,19 @@ export function build({ scene, phone }) {
   const lampArm = cyl(0.015, 0.015, 0.5, '#2a2f36', 6); lampArm.position.set(-3.5, 1.05, -3.6); scene.add(lampArm);
   const lampHead = cyl(0.05, 0.13, 0.12, '#2a2f36', 14); lampHead.position.set(-3.5, 1.33, -3.55); scene.add(lampHead);
   const mug = cyl(0.045, 0.04, 0.09, '#f2efe8', 12); mug.position.set(-3.3, 0.83, -3.3); scene.add(mug);
-  const chair = box(0.5, 0.06, 0.5, '#2e3340'); chair.position.set(-3.0, 0.48, -2.7); scene.add(chair);
-  const chairBack = box(0.5, 0.5, 0.06, '#2e3340'); chairBack.position.set(-3.0, 0.78, -2.45); scene.add(chairBack);
-  const chairStem = cyl(0.03, 0.03, 0.44, '#55595f', 6); chairStem.position.set(-3.0, 0.24, -2.7); scene.add(chairStem);
+  officeChair(scene, -3.0, -2.75, Math.PI + 0.2, { color: '#2e3340' });
+  deskClutter(scene, -3.55, 0.79, -3.45, { seed: 2 });
+  // 書桌上方的層架與第二個螢幕（在家工作）
+  const wshelf = box(1.6, 0.04, 0.26, '#a8845a'); wshelf.position.set(-3.0, 1.75, -RD / 2 + 0.23); scene.add(wshelf);
+  shelfClutter(scene, -3.75, 1.77, -RD / 2 + 0.23, 1.45, { seed: 12, depth: 0.2 });
+  const mon = box(0.62, 0.38, 0.03, '#1b1d22'); mon.position.set(-3.15, 1.15, -3.78); scene.add(mon);
+  const monS = new THREE.Mesh(new THREE.PlaneGeometry(0.58, 0.34), new THREE.MeshBasicMaterial({ color: '#2a4a6a' })); monS.position.set(-3.15, 1.15, -3.764); scene.add(monS);
+  const monStand = box(0.05, 0.3, 0.05, '#55595f'); monStand.position.set(-3.15, 0.93, -3.8); scene.add(monStand);
+  trashCan(scene, -1.75, -3.55, { color: '#9aa0a6' });
 
   /* ---------- 左側：沙發、茶几、地毯 ---------- */
-  const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.2), new THREE.MeshStandardMaterial({ color: '#4a5a6a', roughness: 1 }));
-  rug.rotation.x = -Math.PI / 2; rug.position.set(-1.9, 0.012, -0.6); rug.receiveShadow = true; scene.add(rug);
-  const sofa = box(2.6, 0.45, 0.95, '#6a6f78'); sofa.position.set(-1.9, 0.33, -1.6); scene.add(sofa);
-  const sofaBack = box(2.6, 0.65, 0.22, '#6a6f78'); sofaBack.position.set(-1.9, 0.76, -2.0); scene.add(sofaBack);
-  [[-2.6, '#d9a441'], [-1.4, '#5a8a7a']].forEach(([x, c]) => { const p = box(0.4, 0.34, 0.13, c); p.position.set(x, 0.72, -1.75); scene.add(p); });
+  patternRug(scene, -1.9, -0.6, 3.4, 2.2, { base: '#4a5a6a', border: '#cfc6b4', accent: '#c9a24a', seed: 8 });
+  sofa(scene, -1.9, -1.75, 0, { w: 2.6, color: '#6a6f78', pillows: ['#d9a441', '#5a8a7a'] });
   const ctable = box(1.1, 0.05, 0.6, '#7a5a3a'); ctable.position.set(-1.9, 0.4, -0.5); scene.add(ctable);
   [[-0.5, -0.24], [0.5, -0.24], [-0.5, 0.24], [0.5, 0.24]].forEach(([x, z]) => { const l = box(0.05, 0.4, 0.05, '#4a3420'); l.position.set(-1.9 + x, 0.2, -0.5 + z); scene.add(l); });
   [['#8a2a2a', 0], ['#2a5a8a', 0.04]].forEach(([c, dy]) => { const b = box(0.28, 0.04, 0.2, c); b.position.set(-1.9, 0.44 + dy, -0.5); scene.add(b); });
@@ -77,22 +81,22 @@ export function build({ scene, phone }) {
   framedPicture(scene, -1.9, 2.0, -RD / 2 + 0.17, 0, 1.0, 0.7, 4);
   framedPicture(scene, 1.2, 2.2, -RD / 2 + 0.17, 0, 0.6, 0.8, 6);
   // 落地燈
-  const fpole = box(0.04, 1.6, 0.04, '#2f3338'); fpole.position.set(-3.4, 0.8, -1.4); scene.add(fpole);
-  const fshade = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({ color: '#f2e6c8', emissive: '#ffd58a', emissiveIntensity: 0.6, side: THREE.DoubleSide }));
+  const fbase = cyl(0.16, 0.18, 0.03, '#2f3338', 16); fbase.position.set(-3.4, 0.015, -1.4); scene.add(fbase);
+  const fpole = cyl(0.015, 0.015, 1.6, '#2f3338', 8); fpole.position.set(-3.4, 0.8, -1.4); scene.add(fpole);
+  const fshade = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.3, 18, 1, true), new THREE.MeshStandardMaterial({ color: '#f2e6c8', emissive: '#ffd58a', emissiveIntensity: 0.6, side: THREE.DoubleSide }));
   fshade.position.set(-3.4, 1.7, -1.4); scene.add(fshade);
-
+  wallClock(scene, 0.2, 2.45, -RD / 2 + 0.12, 0, { r: 0.18, rim: '#c9b996' });
   /* ---------- 右側：書櫃、門、掛勾上的口罩 ---------- */
-  const shelf = box(0.35, 2.0, 2.0, '#5a4030'); shelf.position.set(RW / 2 - 0.2, 1.0, -2.3); scene.add(shelf);
-  const bookCols = ['#8a2a2a', '#2a5a8a', '#d9b84a', '#3a7a4a', '#f2efe8', '#5a3a7a'];
-  for (let row = 0; row < 4; row++) for (let i = 0; i < 8; i++) {
-    const bk = box(0.06, 0.26, 0.16, bookCols[(row * 3 + i) % bookCols.length]); bk.position.set(RW / 2 - 0.36, 0.3 + row * 0.5, -3.15 + i * 0.22); scene.add(bk);
-  }
+  bookcase(scene, RW / 2 - 0.27, -2.3, -Math.PI / 2, { w: 2.0, h: 2.0, color: '#5a4030', shelves: 4, seed: 6 });
   doorway(scene, { pos: V(RW / 2 - 0.1, 0, 1.6), yaw: -Math.PI / 2, w: 0.95, h: 2.1, color: '#8a6a46', handle: '#c9ccd2' });
   // 門邊的掛勾：掛著一個口罩和一串鑰匙（2020 年的日常）
   const hook = box(0.05, 0.05, 0.05, '#2a2a2e'); hook.position.set(RW / 2 - 0.1, 1.55, 0.6); scene.add(hook);
   const mask = box(0.02, 0.1, 0.17, '#bcd7ea'); mask.position.set(RW / 2 - 0.13, 1.47, 0.6); scene.add(mask);
   const keys = box(0.02, 0.07, 0.04, '#b8bcc4', { metalness: 0.8 }); keys.position.set(RW / 2 - 0.13, 1.47, 0.78); scene.add(keys);
-  const shoes = box(0.5, 0.12, 0.3, '#3a3a42'); shoes.position.set(RW / 2 - 0.5, 0.06, 0.4); scene.add(shoes);
+  // 鞋櫃與鞋子
+  const shoeRack = box(0.32, 0.45, 0.9, '#d8d0c0'); shoeRack.position.set(RW / 2 - 0.27, 0.225, 0.45); scene.add(shoeRack);
+  [[0.15, '#3a3a42'], [0.45, '#e8e4dc'], [0.75, '#8a3a2a']].forEach(([dz, c]) => { [-0.05, 0.05].forEach((o) => { const sh = box(0.26, 0.08, 0.09, c, { roughness: 0.6 }); sh.position.set(RW / 2 - 0.55, 0.04, dz + o); scene.add(sh); }); });
+  const tray = box(0.28, 0.02, 0.2, '#c9b996'); tray.position.set(RW / 2 - 0.27, 0.46, 0.3); scene.add(tray);
 
   /* ---------- 高腳圓桌：手機放在 MagSafe 充電座上 ---------- */
   const TABLE = V(1.2, 0, -0.3), TOP = 1.05;

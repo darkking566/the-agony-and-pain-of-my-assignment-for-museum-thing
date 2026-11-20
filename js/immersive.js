@@ -589,6 +589,7 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
   const debug = {
     go(i, t = 0) { ui.intro.hidden = true; ui.end.hidden = true; startBeat(i); beatT = t; },
     look(y, p) { yaw = y; pitch = p; autoTurn = null; lastDrag = performance.now(); },
+    stats() { let meshes = 0, mats = new Set(); scene.traverse((o) => { if (o.isMesh || o.isInstancedMesh) { meshes++; (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => mats.add(m)); } }); return { meshes, materials: mats.size, tris: renderer.info.render.triangles, calls: renderer.info.render.calls }; },
     lookAt(id) { const d = dirTo(spots[id] ? spots[id].pos() : world.focus[id]()); yaw = d.yaw; pitch = d.pitch; autoTurn = null; lastDrag = performance.now(); }
   };
   return { exit, debug };

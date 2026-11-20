@@ -3,7 +3,8 @@
 // 每段演出的 update(t, T) 只依照時間 t 算出所有人的狀態，所以可以直接「跳過」到任何時間點。
 import * as THREE from 'three';
 import { V, span, lerp, box, cyl, sign, Person } from '../scene-kit.js';
-import { richRoom, windowView, leafyPlant, framedPicture, blobShadow } from './props.js';
+import { richRoom, windowView, leafyPlant, framedPicture, blobShadow, ceilingLights, doorway } from './props.js';
+import { officeChair, crtMonitor, pcTower, christmasTree, filingCabinet, waterCooler, cubicle, deskClutter, wallClock, bookcase, trashCan } from './props2.js';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const MSG = 'Merry Christmas';
@@ -38,6 +39,7 @@ export function build({ scene, phone }) {
   // 左牆窗戶：窗外是冬天的街
   windowView(scene, { pos: V(-RW / 2 + 0.11, 1.6, -0.6), yaw: Math.PI / 2, w: 2.4, h: 1.6, view: 'city', frame: '#3b2f27', blinds: 0.28 });
 
+  ceilingLights(scene, [-2.5, 0.5, 3.5], [-1.6, 1.6], RH - 0.01, 1.2, 0.6, '#fff8e6');
   /* ---------- 辦公桌與電腦 ---------- */
   const DESK_Z = -0.6;
   const top = box(2.4, 0.07, 0.9, '#b08a5c'); top.position.set(-1.8, 0.78, DESK_Z);
@@ -53,6 +55,9 @@ export function build({ scene, phone }) {
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.46), screenMat);
   screen.position.set(-1.8, 1.2, DESK_Z - 0.08);
   scene.add(screen);
+  { const back = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.36, 0.42, 4), new THREE.MeshStandardMaterial({ color: '#23262c', roughness: 0.6 })); back.rotation.set(Math.PI / 2, Math.PI / 4, 0); back.position.set(-1.8, 1.2, DESK_Z - 0.36); scene.add(back); }
+  pcTower(scene, -2.75, DESK_Z + 0.05, 0.1);
+  cubicle(scene, -1.8, DESK_Z - 0.05, 0, { w: 2.7, d: 1.3, h: 1.3, fabric: '#6f7a86' });
   const keyboard = box(0.9, 0.025, 0.3, '#2a2d33'); keyboard.position.set(-1.8, 0.83, DESK_Z + 0.32); scene.add(keyboard);
   const mouse = box(0.08, 0.03, 0.12, '#2a2d33'); mouse.position.set(-1.25, 0.84, DESK_Z + 0.32); scene.add(mouse);
 
@@ -69,10 +74,7 @@ export function build({ scene, phone }) {
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.04, 0.12, 12), new THREE.MeshStandardMaterial({ color: ['#f2efe8', '#c9a46a', '#f2efe8'][i] }));
     cup.position.set(PARTY_TABLE.x + x, 0.97, PARTY_TABLE.z + 0.15); scene.add(cup);
   });
-  const tree = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.6, 12), new THREE.MeshStandardMaterial({ color: '#2f6b3a', roughness: 0.9 }));
-  tree.position.set(4.0, 1.4, -3.2); tree.castShadow = true; scene.add(tree);
-  const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.1), new THREE.MeshStandardMaterial({ color: '#f5d26b', emissive: '#f5c04a', emissiveIntensity: 0.6 }));
-  star.position.set(4.0, 2.25, -3.2); scene.add(star);
+  christmasTree(scene, 4.0, -3.2, { h: 1.9 });
   leafyPlant(scene, -4.1, -3.0, 1.0, 1);
   framedPicture(scene, -2.6, 2.0, -RD / 2 + 0.17, 0, 0.7, 0.9, 1);
 
@@ -84,13 +86,12 @@ export function build({ scene, phone }) {
   const cal = sign('DEC 1992', 0.7, 0.8, { bg: '#b8382c', color: '#fff7e6', size: 64, w: 360, h: 420, weight: 800 });
   cal.position.set(-0.4, 1.9, -RD / 2 + 0.21); scene.add(cal);
   // 檔案櫃（兩個）與飲水機
-  [[4.1, -3.4], [4.1, -2.6]].forEach(([x, z]) => {
-    const cab = box(0.55, 1.25, 0.5, '#8a8f96', { roughness: 0.5, metalness: 0.3 }); cab.position.set(x, 0.63, z); scene.add(cab);
-    const drawer = box(0.5, 0.02, 0.02, '#4a4f55'); drawer.position.set(x, 0.9, z + 0.26); scene.add(drawer);
-  });
-  const cooler = cyl(0.16, 0.16, 0.5, '#e8f1f8', 14); cooler.position.set(4.6, 0.25, -0.9); scene.add(cooler);
-  const jug = cyl(0.13, 0.13, 0.36, '#9fd3f2', 14); jug.position.set(4.6, 0.68, -0.9); scene.add(jug);
-
+  // 檔案櫃（靠右牆、朝房間）與飲水機
+  filingCabinet(scene, 4.6, -1.9, -Math.PI / 2); filingCabinet(scene, 4.6, -1.4, -Math.PI / 2, { color: '#8a8f96' });
+  waterCooler(scene, 4.65, -0.6, -Math.PI / 2);
+  bookcase(scene, RW / 2 - 0.27, 2.4, -Math.PI / 2, { w: 1.6, h: 1.9, color: '#6b5a48', shelves: 4, seed: 9 });
+  wallClock(scene, 1.6, 2.55, -RD / 2 + 0.12, 0);
+  trashCan(scene, -0.8, -1.0); trashCan(scene, 4.0, 1.6);
   // 第二張辦公桌：同事正在打字（同事的動作在 ambient 裡）
   const DESK2 = V(3.0, 0, 0.9);
   const d2 = box(2.0, 0.07, 0.8, '#b08a5c'); d2.position.set(DESK2.x, 0.78, DESK2.z); scene.add(d2);
@@ -101,16 +102,14 @@ export function build({ scene, phone }) {
   const s2 = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.4), new THREE.MeshBasicMaterial({ color: '#1b3b2a' }));
   s2.position.set(DESK2.x, 1.17, DESK2.z - 0.15); scene.add(s2);
   const k2 = box(0.9, 0.025, 0.3, '#2a2d33'); k2.position.set(DESK2.x, 0.83, DESK2.z + 0.22); scene.add(k2);
+  { const back2 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.32, 0.38, 4), new THREE.MeshStandardMaterial({ color: '#23262c', roughness: 0.6 })); back2.rotation.set(Math.PI / 2, Math.PI / 4, 0); back2.position.set(DESK2.x, 1.17, DESK2.z - 0.43); scene.add(back2); }
+  pcTower(scene, DESK2.x - 0.75, DESK2.z + 0.05, 0);
+  deskClutter(scene, DESK2.x - 0.4, 0.815, DESK2.z + 0.05, { seed: 4 });
   const mug2 = cyl(0.05, 0.05, 0.1, '#c0392b', 12); mug2.position.set(DESK2.x + 0.75, 0.9, DESK2.z + 0.1); scene.add(mug2);
 
   /* ---------- 第三輪：椅子、印表機、紙堆、電話與植物 ---------- */
   // 兩把辦公椅（靠在桌子前）
-  [[-0.1, -0.7], [3.0, 1.2]].forEach(([x, z]) => {
-    const seat = box(0.5, 0.08, 0.5, '#2e3340'); seat.position.set(x, 0.5, z); scene.add(seat);
-    const back = box(0.5, 0.55, 0.06, '#2e3340'); back.position.set(x, 0.85, z - 0.22); scene.add(back);
-    const stem = cyl(0.03, 0.03, 0.42, '#55595f', 6); stem.position.set(x, 0.23, z); scene.add(stem);
-    const base = cyl(0.25, 0.25, 0.04, '#55595f', 10); base.position.set(x, 0.03, z); scene.add(base);
-  });
+  officeChair(scene, -0.1, -0.7, 0.3); officeChair(scene, 3.0, 1.45, Math.PI);
   // 桌上的電話、紙堆、馬克杯與小植物
   const deskPhone = box(0.3, 0.1, 0.22, '#2a2a2e'); deskPhone.position.set(-2.5, 0.85, -0.45); scene.add(deskPhone);
   const deskHandset = box(0.28, 0.05, 0.06, '#2a2a2e'); deskHandset.position.set(-2.5, 0.92, -0.45); scene.add(deskHandset);
