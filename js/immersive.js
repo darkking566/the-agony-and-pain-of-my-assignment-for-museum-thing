@@ -10,6 +10,7 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
   // 環境反光用的小模組：一開始就下載，和場景建立同時進行，不要排在場景建好之後才開始
   const envImport = import('three/addons/environments/RoomEnvironment.js').catch(() => null);
   const fxImport = import('./postfx.js').catch(() => null);
+  const ptImport = import('./particles.js').catch(() => null);
   /* ---------- 介面 ---------- */
   const root = document.createElement('div');
   root.className = 'imm';
@@ -126,6 +127,9 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
       ms.forEach((m) => { if (m.isMeshStandardMaterial) m.envMapIntensity = ei; });
     });
   } catch (err) { console.warn('環境反光載入失敗', err); }
+  // 環境粒子（灰塵、花粉、落葉）
+  let particles = null;
+  try { const pm = await ptImport; if (pm) particles = pm.createParticles(scene, script.module, base); } catch (e) { console.warn('粒子載入失敗', e); }
   // 後製（Bloom、暗角、色彩分級）：載入失敗或加 ?nofx 就直接繪製
   let fx = null;
   if (!/[?&]nofx\b/.test(location.search)) {
@@ -538,6 +542,7 @@ export async function openExperience({ script, phone, onExit, onComplete }) {
       ui.arrow.textContent = { left: '‹ 看這邊', right: '看這邊 ›', up: '︿ 往上看', down: '往下看 ﹀' }[arrow] || '';
     }
 
+    if (particles) particles.update(T);
     if (fx) fx.render(dt); else renderer.render(scene, camera);
   }
   const proj = new THREE.Vector3();

@@ -101,6 +101,31 @@ export class Person {
     cap.castShadow = true;
     head.add(skull, cap);
 
+    // 臉：眼睛、眉毛、鼻子、嘴（臉朝 +z）
+    const dark = mat('#1a1410', { roughness: 0.5 });
+    const skinDeep = mat(new THREE.Color(skin).multiplyScalar(0.86).getStyle());
+    const white = mat('#f4f1ea', { roughness: 0.4 });
+    const face = this.face = new THREE.Group();
+    face.position.set(0, 0.12, 0);
+    [1, -1].forEach((sd) => {
+      const eyeW = new THREE.Mesh(new THREE.SphereGeometry(0.02, 10, 8), white);
+      eyeW.scale.set(1, 0.8, 0.5); eyeW.position.set(sd * 0.044, 0.018, 0.108);
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.0115, 8, 6), dark);
+      pupil.scale.set(1, 1, 0.6); pupil.position.set(sd * 0.044, 0.018, 0.116);
+      const lid = box(0.04, 0.007, 0.012, hair); lid.castShadow = false;
+      lid.position.set(sd * 0.044, 0.045, 0.108); lid.rotation.z = sd * -0.12;
+      const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.017, 8, 6), mat(new THREE.Color(skin).lerp(new THREE.Color('#e07a6a'), 0.25).getStyle()));
+      cheek.scale.set(1, 0.7, 0.4); cheek.position.set(sd * 0.07, -0.022, 0.098);
+      face.add(eyeW, pupil, lid, cheek);
+    });
+    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.017, 8, 6), skinDeep);
+    nose.scale.set(0.8, 1, 1); nose.position.set(0, -0.012, 0.12);
+    const mouth = box(0.05, 0.006, 0.01, '#8c4a44', { roughness: 0.6 });
+    mouth.castShadow = false; mouth.position.set(0, -0.05, 0.108);
+    face.add(nose, mouth);
+    face.traverse((o) => { if (o.isMesh) o.castShadow = false; });
+    head.add(face);
+
     // 頭兩側的掛點：拿電話、話筒時用
     this.ear = {};
     [1, -1].forEach((side) => {
@@ -126,6 +151,18 @@ export class Person {
       const palm = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), mat(skin));
       palm.castShadow = true;
       hand.add(palm);
+      // 手指：四指併攏、微彎，拇指在內側
+      const fm = mat(skin);
+      [[-0.024, 0.052], [-0.008, 0.06], [0.008, 0.058], [0.024, 0.046]].forEach(([fx, len]) => {
+        const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.0085, len, 3, 6), fm);
+        f.position.set(fx, -0.06 - len * 0.3, 0.03);
+        f.rotation.x = -0.5;
+        hand.add(f);
+      });
+      const th = new THREE.Mesh(new THREE.CapsuleGeometry(0.0095, 0.03, 3, 6), fm);
+      th.position.set(-side * 0.045, -0.03, 0.04);
+      th.rotation.set(-0.7, 0, -side * 0.7);
+      hand.add(th);
       // 手上的掛點：拿東西時用
       const grip = new THREE.Object3D();
       grip.position.set(0, -0.03, 0.03);
