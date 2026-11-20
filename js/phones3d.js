@@ -1123,5 +1123,6 @@ export function buildPhone(p) {
   (BUILDERS[p.shape] || candybar)(rig, p);
   finishRig(rig);
   rig.update(0, 0);   // 套用預設狀態：靜止時只顯示一體成形的外觀，內部零件先藏起來
+  rig.root.userData.isPhoneModel = true;   // 測試統計用：把展品手機和場景本身分開計算
   return rig;
 }
