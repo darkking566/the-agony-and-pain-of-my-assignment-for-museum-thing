@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>展覽｜機不可失</title>
+<meta name="description" content="行動電話時間軸：平面年代導覽與 3D 展廳。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Crect x='21' y='10' width='22' height='44' rx='5' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Ccircle cx='32' cy='47' r='2.5' fill='%232997ff'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="機不可失">
+<meta property="og:title" content="展覽｜機不可失">
+<meta property="og:description" content="行動電話時間軸：平面年代導覽與 3D 展廳。">
+<meta property="og:locale" content="zh_TW">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="css/3d.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/transitions.css">
+<script src="js/transitions.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+</head>
+<body data-page="exhibit">
+<div id="site-nav"></div>
+
+<section class="band page-head dark"><div class="wrap">
+  <p class="eyebrow">主展區</p>
+  <h1>行動電話時間軸</h1>
+  <p class="sub">從 1940 年代到 2020 年代，選一個年代，點展品翻面看介紹。想要身歷其境，就切到 3D 展廳。</p>
+</div></section>
+<section class="band" id="exhibit-top"><div class="wrap" style="padding-block:40px 80px">
+  <div class="exhibit-bar">
+    <div class="mode-switch" role="tablist" aria-label="參觀模式">
+      <button role="tab" id="tab-2d" aria-selected="true" aria-controls="panel-2d">平面時間軸</button>
+      <button role="tab" id="tab-3d" aria-selected="false" aria-controls="panel-3d">3D 展廳</button>
+    </div>
+    <div class="filters">
+      <input type="search" id="search" placeholder="搜尋手機、年份或關鍵字" aria-label="搜尋展品" autocomplete="off">
+      <label class="chip-toggle" for="core-only"><input type="checkbox" id="core-only"> 只看核心展品</label>
+    </div>
+  </div>
+  <div id="panel-2d" role="tabpanel" aria-labelledby="tab-2d">
+    <div class="era-rail" id="era-rail" role="tablist" aria-label="年代"></div>
+    <div class="era-panel" id="era-panel"></div>
+    <div id="search-results" hidden></div>
+  </div>
+  <div id="panel-3d" role="tabpanel" aria-labelledby="tab-3d" hidden>
+    <div class="hall" id="hall">
+      <div class="hall-canvas" id="hall-canvas"></div>
+      <div class="hall-loading" id="hall-loading"><div class="hall-skel"><span class="hs-phone"></span><span class="hs-bar"><i></i></span><p>展廳載入中…</p></div></div>
+      <div class="hall-count" id="hall-count" aria-live="polite"></div>
+      <div class="hall-hint">拖曳旋轉 · 雙指縮放 · 點按鍵、螢幕和圓點試試看 · 點發光展台進入沉浸體驗</div>
+      <button class="hall-nav prev" id="hall-prev" aria-label="上一件展品">‹</button>
+      <button class="hall-nav next" id="hall-next" aria-label="下一件展品">›</button>
+      <div class="hall-info" id="hall-info"></div>
+    </div>
+    <div class="hall-strip" id="hall-strip" role="group" aria-label="用年份跳到展品"></div>
+  </div>
+</div></section>
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/passport.js"></script>
+<script src="js/exhibit.js"></script>
+</body>
+</html>
