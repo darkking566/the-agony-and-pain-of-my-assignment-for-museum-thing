@@ -208,9 +208,22 @@ window.FACTS = [
  {
   "item": "Nokia 3310",
   "claim": "「摔不壞的 Nokia」",
-  "status": "todo",
-  "note": "民間說法，沒有找到正式測試。站內已改成「以耐用聞名」，並註明是民間說法。",
-  "src": []
+  "status": "ok",
+  "note": "耐用是真的（有四樓摔落、彈弓測試等紀錄），但並非摔不壞：熱源與高溫都能毀掉它。站內寫成「以耐用聞名」，並註明是民間說法，措辭正確。",
+  "src": [
+   [
+    "Android Authority",
+    "https://www.androidauthority.com/nokia-3310-900425/"
+   ],
+   [
+    "BGR：Was the Nokia 3310 really indestructible?",
+    "https://www.bgr.com/2287710/was-nokia-3310-really-indestructible/"
+   ],
+   [
+    "Yahoo News：從四樓窗戶摔落仍可用",
+    "https://uk.news.yahoo.com/drop-tested-old-nokia-3310-090714688.html"
+   ]
+  ]
  },
  {
   "item": "Samsung Galaxy Note",
@@ -243,9 +256,22 @@ window.FACTS = [
  {
   "item": "Samsung Galaxy Note",
   "claim": "2011 年多數智慧型手機螢幕約 3 到 4 吋",
-  "status": "todo",
-  "note": "場景「朋友的手機」熱點用到，屬概略說法，沒有找到統計出處。",
-  "src": []
+  "status": "diff",
+  "note": "沒有找到 2011 年全市場的螢幕尺寸統計。可查證的是旗艦機：iPhone 4S 3.5 吋、Galaxy S II 約 4.3 吋、Galaxy Note 5.3 吋；PhoneArena 的讀者調查偏好約 4.3 吋。「3 到 4 吋」偏小，站內已改成「大約 3.5 到 4.3 吋」，並指明是主流旗艦機。",
+  "src": [
+   [
+    "Computerworld：Smartphone screens are getting bigger",
+    "https://www.computerworld.com/article/2726181/smartphone-screens-are-getting-bigger.html"
+   ],
+   [
+    "Engadget：The ever-expanding smartphone screen",
+    "https://www.engadget.com/2013/03/01/the-ever-expanding-smartphone-screen/"
+   ],
+   [
+    "PhoneArena：4.5 吋取代 4.3 吋成為最佳尺寸（讀者調查）",
+    "https://www.phonearena.com/news/Smartphone-buyers-prefer-an-ever-larger-screen---4.5-takes-over-4.3-as-the-sweet-spot_id42949"
+   ]
+  ]
  },
  {
   "item": "iPhone（第一代）",
@@ -779,8 +805,17 @@ window.FACTS = [
   "item": "Orbitel 901／第一則簡訊",
   "claim": "場景裡主管的手機「響了一下」",
   "status": "todo",
-  "note": "這是場景的示意：手機當時怎麼提示來訊息，沒有找到出處。來電震動是 StarTAC（1996）的賣點，所以場景不寫震動。",
-  "src": []
+  "note": "仍沒有出處。已確認的是：第一則簡訊 1992-12-03 由 Neil Papworth 傳給 Vodafone 的 Richard Jarvis，Jarvis 用 Orbitel 901 接收，且無法回覆。來訊時手機如何提示，沒有可靠紀錄，維持為場景示意。",
+  "src": [
+   [
+    "Wikipedia：Neil Papworth",
+    "https://en.wikipedia.org/wiki/Neil_Papworth"
+   ],
+   [
+    "Smithsonian：The First Text Message",
+    "https://www.smithsonianmag.com/smart-news/the-first-text-message-sent-twenty-years-ago-was-merry-christmas-152311567/"
+   ]
+  ]
  },
  {
   "item": "IBM Simon",
@@ -929,9 +964,22 @@ window.FACTS = [
  {
   "item": "SCR-300 背負式無線對講機",
   "claim": "話筒上有通話鍵：按住說話、放開收聽",
-  "status": "todo",
-  "note": "這是這一類對講機的典型用法，場景與展廳的解說都這樣寫，但本次沒有找到專門談 SCR-300 話筒的出處。建議再查 SCR-300 的技術手冊（TM 11-5820 系列）。",
-  "src": []
+  "status": "ok",
+  "note": "Warfare History Network 描述操作：選頻道、調靜噪旋鈕，按下話筒上的蝶形開關發話，放開收聽；SCR-300 是半雙工收發機。目前是二手描述，若要引到手冊層級，請再對照 TM 11-242 掃描檔（radionerds）的話筒章節。",
+  "src": [
+   [
+    "Warfare History Network：SCR-300",
+    "https://warfarehistorynetwork.com/article/scr-300-ww2-radio-backppack-the-walkie-talkie-that-shaped-the-war/"
+   ],
+   [
+    "Wikipedia：SCR-300",
+    "https://en.wikipedia.org/wiki/SCR-300"
+   ],
+   [
+    "TM 11-242（1943，radionerds 掃描檔）",
+    "https://www.radionerds.com/images/c/c5/TM_11-242_1943.pdf"
+   ]
+  ]
  },
  {
   "item": "Orbitel 901／第一則簡訊",
@@ -957,8 +1005,13 @@ window.FACTS = [
   "item": "Orbitel 901／第一則簡訊",
   "claim": "Orbitel 901 的實物外型（3D 模型與 1992 場景裡主管手上的裝置）",
   "status": "todo",
-  "note": "沒有找到可靠的外型描述。3D 展廳只用通用的「早期大型手機」造型；1992 場景畫成「放在桌上的厚重主機」，主管要走近、彎下腰才看得到螢幕。外型與擺放位置都是示意，場景說明中已註明。",
-  "src": []
+  "note": "再查一次仍沒有可靠的外型描述；報導只說它是「可攜式」手機，重量約 2.1 公斤。維持示意畫法，場景說明已註明。",
+  "src": [
+   [
+    "Smithsonian：The First Text Message",
+    "https://www.smithsonianmag.com/smart-news/the-first-text-message-sent-twenty-years-ago-was-merry-christmas-152311567/"
+   ]
+  ]
  },
  {
   "item": "iPhone 12",
@@ -1023,9 +1076,18 @@ window.FACTS = [
  {
   "item": "iPhone 12",
   "claim": "2020 年很多人因疫情待在家裡，用視訊跟家人見面（場景的背景說明）",
-  "status": "todo",
-  "note": "屬於一般的歷史背景，本次沒有另外找出處。場景只用一句帶過，沒有寫任何數字。",
-  "src": []
+  "status": "ok",
+  "note": "Ofcom：英國成人每週視訊通話比例從疫情前約 35% 升到 70% 以上；65 歲以上從 22%（2020 年 2 月）升到 61%（5 月）。比利時調查也指出祖孫與父母子女是視訊通話的主力。場景只用一句帶過、沒寫數字，與出處相符。",
+  "src": [
+   [
+    "Ofcom：UK internet use surges",
+    "https://ofcom.org.uk/news-centre/2020/uk-internet-use-surges"
+   ],
+   [
+    "Telenet：Grandparents got hooked on video calls",
+    "https://press.telenet.be/grandparents-got-hooked-on-video-calls-thanks-to-coronavirus"
+   ]
+  ]
  },
  {
   "item": "圖片授權",
