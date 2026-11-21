@@ -60,6 +60,8 @@
 .hall-info .hi-more { display: none; max-height: 24vh; overflow-y: auto; }
 .hall-info.open .hi-lead { display: block; -webkit-line-clamp: unset; }
 .hall-info.open .hi-more { display: block; }
+.hall-info.open { max-height: 62%; overflow-y: auto; }
+.hall-info.open .hi-more { max-height: none; overflow: visible; }
 .hall-info .hi-toggle { padding: 0; margin: 0 0 8px; border: 0; background: none; color: #7db4ff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .hall-info .hi-toggle:hover { text-decoration: underline; }
 .hall-info .hi-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -116,6 +118,7 @@
   .hall .hall-nav.prev { left: 10px; right: auto; top: 46%; bottom: auto; }
   .hall .hall-nav.next { right: 10px; top: 46%; bottom: auto; }
   .hall-hint { display: none; }
+  .hall-info.open { max-height: 40%; }   /* 窄螢幕：展開的說明卡在卡片內捲動，不要蓋住展品 */
 }
 
 /* 展廳下方的年份導覽 */
