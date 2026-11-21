@@ -1,6 +1,6 @@
 // 展覽內容資料：2D 時間軸與 3D 展廳共用這一份。
 // 要改文字、加手機、換照片，改這個檔案就好。
-// 照片：目前先用自動產生的佔位圖。有照片時，把圖片放進 images/ 資料夾，並把該手機的 img 改成 'images/檔名.jpg' 即可。
+// 照片：沒有 img 的展品會自動顯示產生的佔位圖。有照片時，把圖片放進 images/ 資料夾，並把該手機的 img 改成 'images/檔名.jpg' 即可。
 // shape：3D 展廳用來決定模型外型，可用 brick / car / flip / clam / candybar / slider / touch / phablet / modern / radio（背負式電台）/ simon（IBM Simon）
 
 window.MUSEUM = {
@@ -93,7 +93,7 @@ window.MUSEUM = {
     },
     {
       id: 'senator', era: '1980s', year: 1982, name: 'Nokia-Mobira Senator',
-      img: 'images/senator.webp', shape: 'car', color: '#3b3f45',
+      shape: 'car', color: '#3b3f45',
       feature: 'Nokia 推出的第一部車載電話', exhibit: true,
       look: '體積龐大、限制多，定位為車載行動電話，無法隨身攜帶'
     },
@@ -105,7 +105,7 @@ window.MUSEUM = {
     },
     {
       id: 'sc-1000', era: '1980s', year: 1988, name: 'Samsung SC-1000',
-      img: 'images/sc-1000.webp', imgNote: '照片為同時期的三星 SH-100S 手持機，外型與此展品相近。', shape: 'brick', color: '#2b2b2b',
+      shape: 'brick', color: '#2b2b2b',
       feature: '三星早期的車用行動電話',
       look: '專為車內使用設計的行動電話'
     },
