@@ -222,12 +222,21 @@
     $('#hall-info').innerHTML = `
       <div class="year">${p.year}・${esc(eraOf(p).label)}</div>
       <h3>${esc(p.name)}</h3>
-      <p>${esc(p.feature)}</p>
-      <p>${esc(p.look)}</p>
-      ${p.imgNote ? `<p>${esc(p.imgNote)}</p>` : ''}
+      <p class="hi-lead">${esc(p.feature)}</p>
+      <div class="hi-more"><p>${esc(p.look)}</p>${p.imgNote ? `<p>${esc(p.imgNote)}</p>` : ''}</div>
+      <button class="hi-toggle" id="hall-more" type="button" aria-expanded="false">更多說明 ▾</button>
+      <div class="hi-actions">
       <button class="btn small" id="hall-to-2d">在時間軸中查看 →</button>
       <a class="btn small" href="phone.html#${esc(p.id)}">詳細介紹 →</a>
-      ${M.scenes[p.id] ? '<button class="btn small hall-enter" id="hall-enter">▶ 進入沉浸體驗</button>' : ''}`;
+      ${M.scenes[p.id] ? '<button class="btn small hall-enter" id="hall-enter">▶ 進入沉浸體驗</button>' : ''}
+      </div>`;
+    const info = $('#hall-info');
+    info.classList.remove('open');
+    $('#hall-more').onclick = () => {
+      const on = info.classList.toggle('open');
+      $('#hall-more').setAttribute('aria-expanded', on);
+      $('#hall-more').textContent = on ? '收合 ▴' : '更多說明 ▾';
+    };
     $('#hall-to-2d').onclick = () => showPhone2D(p.id);
     if (M.scenes[p.id]) $('#hall-enter').onclick = () => enterScene(p, $('#hall-enter'));
   }

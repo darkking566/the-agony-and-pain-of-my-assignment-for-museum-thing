@@ -273,21 +273,49 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
   const hallEl = container.parentElement;
   const tools = document.createElement('div'); tools.className = 'hall-tools'; hallEl.appendChild(tools);
   const pinsEl = document.createElement('div'); pinsEl.className = 'hall-pins'; hallEl.appendChild(pinsEl);
-  let pins = [], toolLabels = [], partsEl = null, slider = null, preZoom = 1, exploded = false;
+  let pins = [], toolLabels = [], partsEl = null, slider = null, preZoom = 1, exploded = false, cardTopCache = null;
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
   const wantPos = new THREE.Vector3(), wantLook = new THREE.Vector3();
 
+  // 量出畫面上沒被說明卡、操作列、零件清單擋住的空白區域，把展品放在那塊空白的正中間，並縮放到放得下
+  function freeRect() {
+    const W = hallEl.clientWidth, H = hallEl.clientHeight;
+    let l = 0, r = W, t = 0, b = H;
+    const infoEl = hallEl.querySelector('.hall-info');
+    if (infoEl && infoEl.offsetHeight > 0 && getComputedStyle(infoEl).display !== 'none') {
+      // 展開說明時卡片會變高，但展品不跟著縮小：一律照「收合時」的高度安排，展開的卡片直接蓋在上面
+      if (!infoEl.classList.contains('open') || cardTopCache === null) cardTopCache = infoEl.offsetTop;
+      b = Math.min(b, cardTopCache - 8);
+    }
+    if (partsEl && !partsEl.hidden && partsEl.offsetHeight > 0) {
+      if (partsEl.offsetTop > H * 0.4) b = Math.min(b, partsEl.offsetTop - 8);   // 窄螢幕：在底部
+      else l = Math.max(l, partsEl.offsetLeft + partsEl.offsetWidth + 8);         // 寬螢幕：在左邊
+    }
+    if (tools && tools.offsetHeight > 0) {
+      if (tools.offsetWidth > W * 0.6) t = Math.max(t, tools.offsetTop + tools.offsetHeight + 6);   // 窄螢幕：操作列在上方
+      else r = Math.min(r, tools.offsetLeft - 8);                                                    // 寬螢幕：操作列在右邊
+    }
+    t = Math.max(t, 52);   // 上方的進度與提示
+    if (b - t < H * 0.25) b = Math.min(H, t + H * 0.25);
+    if (r - l < W * 0.3) { l = 0; r = W; }
+    return { W, H, l, r, t, b };
+  }
+
   function frame(i) {
     const e = exhibits[i];
-    const h = Math.max(e.size.y, e.size.x);
-    const wide = container.clientWidth >= 720;
-    const dist = Math.max(2.1, h * 1.9 + 0.9) * zoom * (wide ? 1 : 1.15);
-    // 桌機：展品偏左一點（右邊有操作列、左下有說明框）；手機：展品偏上（下方有說明框）
     const { x, y } = e.pivot.position;
     const open = exploded && e.rig.t.explode > 0.3;
-    const sx = (wide ? 0.12 : 0) + (open && wide ? -0.42 : 0), sy = wide ? 0.1 : (open ? 0.1 : 0.32);
-    wantLook.set(x + sx, y - sy, 0);
-    wantPos.set(x + sx + 0.2, y + 0.12, dist);
+    const R = freeRect();
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), tanH = tanV * camera.aspect;
+    const needW = e.size.x + (open ? e.rig.ex * 2.2 : 0), needH = e.size.y + 0.1;
+    const fill = open ? 0.66 : 0.8;   // 展品最多占空白區域的幾成
+    const fitDist = Math.max(needH / (2 * tanV * fill * ((R.b - R.t) / R.H)), needW / (2 * tanH * fill * ((R.r - R.l) / R.W)));
+    const dist = Math.max(2.1, fitDist) * zoom;
+    // 展品要出現在空白區域的中心：鏡頭看向的點，往展品的反方向偏一些
+    const nx = 2 * ((R.l + R.r) / 2) / R.W - 1, ny = 1 - 2 * ((R.t + R.b) / 2) / R.H;
+    const lx = x - nx * tanH * dist, ly = y - ny * tanV * dist;
+    wantLook.set(lx, ly, 0);
+    wantPos.set(lx + 0.2, ly + 0.15, dist);
     spot.position.set(e.pivot.position.x + 0.6, 4.4, 1.8);
     spot.target.position.copy(e.pivot.position);
     beam.position.set(x, PED_H + 0.05 + 1.8, 0);
@@ -422,11 +450,11 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
     const i = typeof target === 'number' ? target : phones.findIndex((p) => p.id === target);
     if (i < 0 || i >= exhibits.length) return;
     if (i !== current) { exhibits[current].rig.reset(); exhibits[current].pivot.rotation.x = 0; }
-    current = i; zoom = 1; tilt = 0; viewYaw = null; exploded = false;
-    frame(i);
-    if (snap) { camPos.copy(wantPos); camLook.copy(wantLook); }
+    current = i; zoom = 1; tilt = 0; viewYaw = null; exploded = false; cardTopCache = null;
     buildUI(i);
     onSelect && onSelect(phones[i], i);
+    frame(i);
+    if (snap) { camPos.copy(wantPos); camLook.copy(wantLook); }
   }
   const step = (d) => goTo(Math.max(0, Math.min(exhibits.length - 1, current + d)));
 
@@ -535,6 +563,8 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
   }
   const ro = new ResizeObserver(resize);
   ro.observe(container);
+  const infoEl0 = hallEl.querySelector('.hall-info');
+  if (infoEl0) new ResizeObserver(() => frame(current)).observe(infoEl0);   // 說明卡展開或收合時，重新安排展品位置
   resize();
 
   /* ---------- 動畫迴圈 ---------- */
