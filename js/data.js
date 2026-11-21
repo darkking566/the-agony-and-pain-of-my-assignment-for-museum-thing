@@ -87,31 +87,31 @@ window.MUSEUM = {
     },
     {
       id: 'dynatac-proto', era: '1970s', year: 1973, name: 'Motorola DynaTAC 原型機',
-      img: 'images/dynatac-8000x.jpg', credit: 'Redrum0486／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:DynaTAC8000X.jpg', imgNote: '照片為 1983 年量產機 DynaTAC 8000X。1973 年原型機沒有可公開使用的照片，外型與此相近。', shape: 'brick', color: '#cfc6b4',
+      img: 'images/dynatac-8000x.webp', credit: 'Redrum0486／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:DynaTAC8000X.jpg', imgNote: '照片為 1983 年量產機 DynaTAC 8000X。1973 年原型機沒有可公開使用的照片，外型與此相近。', shape: 'brick', color: '#cfc6b4',
       feature: '最早的手機，手持式手機誕生，但尚未於市場推出',
       look: '體積大、外形四方、配有長的天線、需要較長時間充電，綽號「黑金剛」'
     },
     {
       id: 'senator', era: '1980s', year: 1982, name: 'Nokia-Mobira Senator',
-      img: 'images/senator.png', shape: 'car', color: '#3b3f45',
+      img: 'images/senator.webp', shape: 'car', color: '#3b3f45',
       feature: 'Nokia 推出的第一部車載電話', exhibit: true,
       look: '體積龐大、限制多，定位為車載行動電話，無法隨身攜帶'
     },
     {
       id: 'dynatac-8000x', era: '1980s', year: 1983, name: 'Motorola DynaTAC 8000X',
-      img: 'images/dynatac-8000x.jpg', credit: 'Redrum0486／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:DynaTAC8000X.jpg', shape: 'brick', color: '#e3ddd0',
+      img: 'images/dynatac-8000x.webp', credit: 'Redrum0486／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:DynaTAC8000X.jpg', shape: 'brick', color: '#e3ddd0',
       feature: '首款商用手機',
       look: '體積大又重，當時只有經濟條件好的人才買得起，又被稱為「大哥大」'
     },
     {
       id: 'sc-1000', era: '1980s', year: 1988, name: 'Samsung SC-1000',
-      img: 'images/sc-1000.png', imgNote: '照片為同時期的三星 SH-100S 手持機，外型與此展品相近。', shape: 'brick', color: '#2b2b2b',
+      img: 'images/sc-1000.webp', imgNote: '照片為同時期的三星 SH-100S 手持機，外型與此展品相近。', shape: 'brick', color: '#2b2b2b',
       feature: '三星早期的車用行動電話',
       look: '專為車內使用設計的行動電話'
     },
     {
       id: 'microtac', era: '1980s', year: 1989, name: 'Motorola MicroTAC',
-      img: 'images/microtac.jpg', credit: 'Ross Padluck（Redrum0486）／公有領域／https://commons.wikimedia.org/wiki/File:Motorola_MicroTAC_9800x.jpg', shape: 'flip', color: '#2a2c30',
+      img: 'images/microtac.webp', credit: 'Ross Padluck（Redrum0486）／公有領域／https://commons.wikimedia.org/wiki/File:Motorola_MicroTAC_9800x.jpg', shape: 'flip', color: '#2a2c30',
       feature: '第一支半掀蓋式行動電話', exhibit: true,
       look: '體積縮小，話筒蓋做在按鍵上方的摺疊設計，讓麥克風更靠近嘴巴'
     },
@@ -129,19 +129,19 @@ window.MUSEUM = {
     },
     {
       id: 'startac', era: '1990s', year: 1996, name: 'Motorola StarTAC',
-      img: 'images/startac.jpg', credit: 'Nkp911m500／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:First_Generation_Motorola_StarTAC_cellular_phone.jpg', shape: 'clam', color: '#1f2226',
+      img: 'images/startac.webp', credit: 'Nkp911m500／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:First_Generation_Motorola_StarTAC_cellular_phone.jpg', shape: 'clam', color: '#1f2226',
       feature: '最早普及的貝殼式摺疊手機，可以放進口袋', exhibit: true,
       look: '重量輕，機身頂部有一根可自由拉出的伸縮天線，有來電震動功能'
     },
     {
       id: 'siemens-s10', era: '1990s', year: 1997, name: 'Siemens S10',
-      img: 'images/siemens-s10.jpg', credit: 'Blahblahleaf1／CC0／https://commons.wikimedia.org/wiki/File:Telekom_Serbia_Siemens_S10.jpg', shape: 'candybar', color: '#4a5560', screen: 'color',
+      img: 'images/siemens-s10.webp', credit: 'Blahblahleaf1／CC0／https://commons.wikimedia.org/wiki/File:Telekom_Serbia_Siemens_S10.jpg', shape: 'candybar', color: '#4a5560', screen: 'color',
       feature: '第一款彩色螢幕手機，為日後的彩色手機發展奠定基礎',
       look: '螢幕只能顯示紅、綠、藍、白四種顏色'
     },
     {
       id: 'nokia-3210', era: '1990s', year: 1999, name: 'Nokia 3210',
-      img: 'images/nokia-3210.jpg', credit: '作者見來源頁／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:Nokia_3210.jpg', shape: 'candybar', color: '#2f5aa8',
+      img: 'images/nokia-3210.webp', credit: '作者見來源頁／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:Nokia_3210.jpg', shape: 'candybar', color: '#2f5aa8',
       feature: '最早普及的內藏天線手機之一',
       look: '能自由更換多種顏色機殼，內建經典的貪吃蛇遊戲'
     },
@@ -159,13 +159,13 @@ window.MUSEUM = {
     },
     {
       id: 'iphone', era: '2000s', year: 2007, name: 'iPhone（第一代）',
-      img: 'images/iphone.png', credit: 'Rafael Fernandez／CC BY-SA 4.0／https://commons.wikimedia.org/wiki/File:IPhone_1st_Gen.svg', imgNote: '圖為向量繪製的第一代 iPhone 示意圖。', shape: 'touch', color: '#c9cbce', exhibit: true,
+      img: 'images/iphone.webp', credit: 'Rafael Fernandez／CC BY-SA 4.0／https://commons.wikimedia.org/wiki/File:IPhone_1st_Gen.svg', imgNote: '圖為向量繪製的第一代 iPhone 示意圖。', shape: 'touch', color: '#c9cbce', exhibit: true,
       feature: '全觸控螢幕、社群媒體時代的起點，改變了現代智慧型手機的面貌',
       look: '正面只有一顆實體 Home 鍵；第一部把音樂播放器、行動電話與瀏覽器（Safari）集於一身的手機'
     },
     {
       id: 'htc-dream', era: '2000s', year: 2008, name: 'HTC Dream',
-      img: 'images/htc-dream.jpg', credit: 'Sumwiki／CC BY 3.0／https://commons.wikimedia.org/wiki/File:HTC_Dream_(front_view).jpg', shape: 'slider', color: '#2a2a2a',
+      img: 'images/htc-dream.webp', credit: 'Sumwiki／CC BY 3.0／https://commons.wikimedia.org/wiki/File:HTC_Dream_(front_view).jpg', shape: 'slider', color: '#2a2a2a',
       feature: '第一款 Android（安卓）手機',
       look: '側滑蓋設計，螢幕下方有實體按鍵與方便操作的軌跡球'
     },
@@ -177,13 +177,13 @@ window.MUSEUM = {
     },
     {
       id: 'galaxy-note', era: '2010s', year: 2011, name: 'Samsung Galaxy Note',
-      img: 'images/galaxy-note.png', credit: 'GadgetsGuy／CC BY 3.0／https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_Note.png', imgNote: '圖為手機正面的示意圖。', shape: 'phablet', color: '#1d1f24', exhibit: true,
+      img: 'images/galaxy-note.webp', credit: 'GadgetsGuy／CC BY 3.0／https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_Note.png', imgNote: '圖為手機正面的示意圖。', shape: 'phablet', color: '#1d1f24', exhibit: true,
       feature: '開創了智慧型手機的大螢幕與手寫筆風潮',
       look: '配備 S Pen 電磁式觸控筆，可以直接在超大螢幕上書寫與繪畫'
     },
     {
       id: 'iphone5s', era: '2010s', year: 2013, name: 'iPhone 5s',
-      img: 'images/iphone5s.png', credit: 'Zach Vega／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:IPhone_5s_Black.png', shape: 'touch', color: '#d8c3a5', flat: true,
+      img: 'images/iphone5s.webp', credit: 'Zach Vega／CC BY-SA 3.0／https://commons.wikimedia.org/wiki/File:IPhone_5s_Black.png', shape: 'touch', color: '#d8c3a5', flat: true,
       feature: '首創實體 Home 鍵結合 Touch ID 指紋辨識',
       look: '主畫面按鈕內建指紋辨識感測器，可用於解鎖手機及確認購買'
     },
