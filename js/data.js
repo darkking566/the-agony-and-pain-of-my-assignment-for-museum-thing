@@ -93,7 +93,7 @@ window.MUSEUM = {
     },
     {
       id: 'senator', era: '1980s', year: 1982, name: 'Nokia-Mobira Senator',
-      img: 'images/senator.png', shape: 'car', color: '#3b3f45',
+      img: 'images/senator.webp', shape: 'car', color: '#3b3f45',
       feature: 'Nokia 推出的第一部車載電話', exhibit: true,
       look: '體積龐大、限制多，定位為車載行動電話，無法隨身攜帶'
     },
@@ -105,7 +105,7 @@ window.MUSEUM = {
     },
     {
       id: 'sc-1000', era: '1980s', year: 1988, name: 'Samsung SC-1000',
-      img: 'images/sc-1000.png', imgNote: '照片為三星 1988 年推出的手持機 SH-100S（與車用電話 SC-1000 為同期早期機型）。', shape: 'brick', color: '#2b2b2b',
+      img: 'images/sc-1000.webp', imgNote: '照片為三星 1988 年推出的手持機 SH-100S（與車用電話 SC-1000 為同期早期機型）。', shape: 'brick', color: '#2b2b2b',
       feature: '三星早期的車用行動電話',
       look: '專為車內使用設計的行動電話'
     },
@@ -117,7 +117,7 @@ window.MUSEUM = {
     },
     {
       id: 'orbitel-901', era: '1990s', year: 1992, name: 'Orbitel 901（第一則簡訊的接收機）',
-      img: 'images/orbitel-901.png', shape: 'brick', color: '#3a3f45', exhibit: true, imgNote: '3D 展廳的模型只是通用的「早期大型手機」造型，不是它的實物外型。',
+      img: 'images/orbitel-901.webp', shape: 'brick', color: '#3a3f45', exhibit: true, imgNote: '3D 展廳的模型只是通用的「早期大型手機」造型，不是它的實物外型。',
       feature: '據記載，全世界第一則簡訊（1992 年 12 月）收到的就是這一類手機',
       look: '屬於「可攜式」電話，不是能放進口袋的手持機：整機據報導約 2.1 公斤，光是電池單元就約 9×19×29 公分'
     },
