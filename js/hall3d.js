@@ -20,13 +20,18 @@ const BLUE = '#60a5fa';
 
 export function initHall(container, phones, { onSelect, onEnter, hasScene = () => false, eras = [] } = {}) {
   /* ---------- 基本場景 ---------- */
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // 效能：手機（觸控）與核心數少的裝置降低解析度上限、陰影品質；執行中再依實際幀率微調
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  const lowEnd = (navigator.hardwareConcurrency || 8) <= 4;
+  const PR_MAX = Math.min(window.devicePixelRatio || 1, coarse || lowEnd ? 1.5 : 2), PR_MIN = 0.75;
+  let pr = PR_MAX;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(pr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = coarse ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -44,7 +49,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
   scene.add(fill);
   const spot = new THREE.SpotLight('#fff3e0', 60, 12, Math.PI / 8, 0.55, 1.3);
   spot.castShadow = true;
-  spot.shadow.mapSize.set(1024, 1024);
+  spot.shadow.mapSize.set(coarse ? 512 : 1024, coarse ? 512 : 1024);
   spot.shadow.bias = -0.0004;
   scene.add(spot, spot.target);
 
@@ -569,6 +574,11 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
   /* ---------- 動畫迴圈 ---------- */
   let running = false, last = 0, raf = 0;
+  // 捲出畫面外就不繪製（迴圈仍在，但每格幾乎沒有成本）；回到畫面時從頭計算幀率
+  let onScreen = true;
+  const io = new IntersectionObserver((es) => { onScreen = es[es.length - 1].isIntersecting; perf.acc = 0; perf.n = 0; });
+  io.observe(container);
+  const perf = { acc: 0, n: 0 };
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const dustHome = new THREE.Vector3();
   const pairCache = new Map();
@@ -589,8 +599,18 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
   function tick(t) {
     if (!running) return;
     raf = requestAnimationFrame(tick);
-    const dt = Math.min(0.05, (t - last) / 1000 || 0);
+    const raw = (t - last) / 1000 || 0;
     last = t;
+    if (!onScreen) return;
+    // 動態解析度：連續太慢就降一階，很順才慢慢升回去
+    perf.acc += Math.min(raw, 0.25); perf.n++;
+    if (perf.n >= 45) {
+      const avg = perf.acc / perf.n;
+      if (avg > 0.03 && pr > PR_MIN) { pr = Math.max(PR_MIN, pr - 0.2); renderer.setPixelRatio(pr); resize(); }
+      else if (avg < 0.0135 && pr < PR_MAX) { pr = Math.min(PR_MAX, pr + 0.1); renderer.setPixelRatio(pr); resize(); }
+      perf.acc = 0; perf.n = 0;
+    }
+    const dt = Math.min(0.05, raw);
     const k = reduceMotion ? 1 : 1 - Math.exp(-dt * 4);
     camPos.lerp(wantPos, k);
     camLook.lerp(wantLook, k);
@@ -652,7 +672,7 @@ export function initHall(container, phones, { onSelect, onEnter, hasScene = () =
 
   return {
     goTo, step, pause, resume,
-    dispose() { pause(); tools.remove(); pinsEl.remove(); if (partsEl) partsEl.remove(); ro.disconnect(); window.removeEventListener('keydown', onKey); pmrem.dispose(); renderer.dispose(); el.remove(); }
+    dispose() { pause(); tools.remove(); pinsEl.remove(); if (partsEl) partsEl.remove(); ro.disconnect(); io.disconnect(); window.removeEventListener('keydown', onKey); pmrem.dispose(); renderer.dispose(); el.remove(); }
   };
 }
 
